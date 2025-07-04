@@ -403,9 +403,9 @@ function CreatorDashboard() {
 
       {/* Upload New Asset modal */}
       <UploadAssetModal
-        open={uploadModalOpen}
-        onClose={() => setUploadModalOpen(false)}
-        onSubmit={handleAssetUpload}
+        isOpen={uploadModalOpen}
+        onRequestClose={() => setUploadModalOpen(false)}
+        onUpload={handleAssetUpload}
       />
     </>
   );
