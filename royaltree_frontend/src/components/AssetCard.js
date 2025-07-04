@@ -3,15 +3,15 @@ import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 import { cardHover } from "../utils/animationPresets";
 
-// PUBLIC_INTERFACE
 /**
- * AssetCard - Card for digital asset/IP. Shows image, title, subtitle, stat badges, supports hover glow and glassmorphism.
+ * PUBLIC_INTERFACE
+ * AssetCard - Card for digital asset/IP. Shows image, title, subtitle, badges, available ownership %, estimated royalty, creator name.
  * @param {string} image URL/path for the asset image
- * @param {string} title
- * @param {string} subtitle
- * @param {string} owner Owner/creator
- * @param {React.Component[]} badges Array of badge components (such as "x% owned")
- * @param {React.Component} footer Custom footer (royalty, price, cta button)
+ * @param {string|ReactNode} title Asset name or placeholder
+ * @param {string|ReactNode} subtitle Asset type/category or placeholder
+ * @param {string|ReactNode} owner Creator/owner name or placeholder
+ * @param {React.Component[]} badges Array of badge components (ownership %, etc.)
+ * @param {React.Component} footer Custom footer (shows available % and est. royalty; optional)
  * @param {Function} onClick
  */
 function AssetCard({ image, title, subtitle, owner, badges = [], footer, onClick }) {

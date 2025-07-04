@@ -9,28 +9,91 @@ import mockAssets from "../data/mockAssets";
 /**
  * Marketplace - Responsive grid of assets with dummy data, filtering & sorting mock controls.
  * Enhances UX: Region/country filtering is enabled when geolocation is available.
+ * This version ensures each AssetCard displays asset name, creator, available ownership %, and estimated royalty.
  */
 function Marketplace() {
-  // Load from mockAssets for all asset rendering
-  const assets = mockAssets.map(asset => ({
-    ...asset,
-    badges: asset.badges.map(b => (
-      <span
-        key={b.key + "-" + asset.id}
-        className="asset-subtitle"
-        style={{
-          background: b.style.background,
-          padding: "4px 10px",
-          borderRadius: "9px",
-          fontWeight: 700,
-          fontSize: 12,
-          color: b.style.color
-        }}
-      >
-        {b.text}
-      </span>
-    ))
-  }));
+  // Utility: Return badge styled span
+  const badgeSpan = (badge, asset, customStyle = {}) => (
+    <span
+      key={badge.key + "-" + asset.id}
+      className="asset-subtitle"
+      style={{
+        background: badge.style && badge.style.background,
+        color: badge.style && badge.style.color,
+        padding: "4px 10px",
+        borderRadius: "9px",
+        fontWeight: 700,
+        fontSize: 13,
+        marginRight: 2,
+        ...customStyle,
+      }}
+    >
+      {badge.text}
+    </span>
+  );
+
+  // Prepare enhanced asset data: assetCardProps
+  const assets = mockAssets.map(asset => {
+    // Ownership % badge (standardized to always show)
+    const ownershipPercent = asset.ownership != null
+      ? Math.round(asset.ownership * 100)
+      : "--";
+    const estRoyalty = asset.estRoyalty != null
+      ? asset.estRoyalty
+      : "--";
+    // Always construct badges for ownership % and estimated royalty
+    const badges = [
+      badgeSpan(
+        {
+          key: "ownership",
+          text: `${ownershipPercent}% Owned`,
+          style: { background: "rgba(0,255,194,0.13)", color: "#00FFC2" }
+        },
+        asset
+      ),
+      badgeSpan(
+        {
+          key: "est",
+          text: `Est. ${estRoyalty}%/yr`,
+          style: { background: "rgba(255,215,0,0.14)", color: "#FFD700" }
+        },
+        asset,
+        { marginLeft: 2 }
+      ),
+    ];
+
+    // Compose AssetCard fields.
+    return {
+      key: asset.id,
+      image: asset.image,
+      title: asset.title || <span style={{ color: "#fff7", fontStyle: "italic" }}>No Title</span>,
+      subtitle: asset.subtitle || <span style={{ color: "#bab9e3" }}>Unknown Type</span>,
+      owner: asset.owner || <span style={{ color: "#bab9e3" }}>Unknown Creator</span>,
+      badges,
+      footer: (
+        <div style={{
+          display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 3, marginTop: 2
+        }}>
+          <span style={{ color: "#FFD700", fontWeight: 600, fontSize: 15.2 }}>
+            Available Ownership
+            <span style={{ color: "#00FFC2", marginLeft: 9 }}>
+              {ownershipPercent !== "--"
+                ? (100 - ownershipPercent) + "%" // available = 100 - owned
+                : "--"}
+            </span>
+          </span>
+          <span style={{
+            color: "#00FFC2", fontWeight: 500, fontSize: 13.6
+          }}>
+            Est. Royalty: <span style={{ color: "#FFD700" }}>
+              {estRoyalty !== "--" ? `${estRoyalty}% / yr` : "--"}
+            </span>
+          </span>
+        </div>
+      ),
+      onClick: () => window.location.href = `/ip/${asset.id}`
+    };
+  });
 
   // Dummy filter state
   const [tab, setTab] = useState("all");
@@ -43,13 +106,33 @@ function Marketplace() {
   const geo = useGeolocation();
 
   // Compute displayed assets applying all filters:
-  const displayedAssets = assets
-    .filter(asset =>
-      (tab === "all" || (tab === "music" && asset.subtitle.includes("Music")) || (tab === "art" && asset.subtitle.includes("Art"))) &&
-      asset.title.toLowerCase().includes(search.toLowerCase()) &&
-      (countryFilter ? asset.country === countryFilter : true) &&
-      (regionFilter ? (asset.region && asset.region === regionFilter) : true)
+  let displayedAssets = assets.filter(asset =>
+    (tab === "all" ||
+      (tab === "music" && (typeof asset.subtitle === "string" ? asset.subtitle.includes("Music") : false)) ||
+      (tab === "art" && (typeof asset.subtitle === "string" ? asset.subtitle.includes("Art") : false))
+    ) &&
+    (typeof asset.title === "string" ? asset.title.toLowerCase().includes(search.toLowerCase()) : false) &&
+    (countryFilter
+      ? (
+        // extra insurance for old data fallbacks
+        mockAssets.find(a => a.id === asset.key)?.country === countryFilter
+      ) : true) &&
+    (regionFilter
+      ? (
+        mockAssets.find(a => a.id === asset.key)?.region === regionFilter
+      ) : true)
+  );
+
+  // Sort: Apply sort method if not 'featured'
+  if (sort === "name") {
+    displayedAssets = [...displayedAssets].sort((a, b) =>
+      (a.title || "").localeCompare(b.title || "")
     );
+  } else if (sort === "owner") {
+    displayedAssets = [...displayedAssets].sort((a, b) =>
+      (a.owner || "").localeCompare(b.owner || "")
+    );
+  }
 
   // NavBar links
   const navLinks = [
@@ -78,7 +161,7 @@ function Marketplace() {
           onClick={() => setRegionFilter(regionFilter ? "" : geo.region)}
           title={geo.region ? "Assets in your region" : undefined}
         >
-          {regionFilter ? "All Regions" : (geo.region || "My&nbsp;Region")}
+          {regionFilter ? "All Regions" : (geo.region || "My Region")}
         </button>
         <button
           style={{
@@ -95,7 +178,7 @@ function Marketplace() {
           onClick={() => setCountryFilter(countryFilter ? "" : geo.country)}
           title={geo.country ? "Assets in your country" : undefined}
         >
-          {countryFilter ? "All Countries" : (geo.country ? geo.country : "My&nbsp;Country")}
+          {countryFilter ? "All Countries" : (geo.country ? geo.country : "My Country")}
         </button>
       </div>
     );
@@ -210,8 +293,8 @@ function Marketplace() {
                   width: "100%",
                   padding: "2em 0"
                 }}>No assets found.</div>
-              : displayedAssets.map((asset, i) => (
-                  <AssetCard key={asset.title + "-" + i} {...asset} />
+              : displayedAssets.map((props, i) => (
+                  <AssetCard {...props} />
                 ))
           }
         </div>
