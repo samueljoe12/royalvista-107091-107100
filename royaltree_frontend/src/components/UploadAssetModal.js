@@ -101,7 +101,7 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
 
   // Modal content: glassmorphic, animated + responsive + scroll if needed
   return (
-    <Modal isOpen={isOpen} onRequestClose={handleClose}>
+    <Modal open={isOpen} onClose={handleClose}>
       <form
         className="upload-asset-form"
         style={{
