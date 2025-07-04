@@ -4,24 +4,32 @@ import AssetCard from "../components/AssetCard";
 import AnimatedCounter from "../components/AnimatedCounter";
 import GradientButton from "../components/GradientButton";
 import InvestModal from "../components/InvestModal";
+import Modal from "../components/Modal";
+import TabSwitcher from "../components/TabSwitcher";
+import MockAudioPlayer from "../components/MockAudioPlayer";
 import { motion } from "framer-motion";
 import { fadeInUp } from "../utils/animationPresets";
 import mockAssets from "../data/mockAssets";
 import mockTransactions from "../data/mockTransactions";
 
-// PUBLIC_INTERFACE
 /**
- * InvestorDashboard - Displays user's owned assets, animated stats for projected returns,
- * and a mocked transaction history. Uses AssetCard, AnimatedCounter, and glassmorphic styling.
+ * PUBLIC_INTERFACE
+ * InvestorDashboard - Tabbed dashboard with "My Assets" and "Transactions" tabs,
+ * owned assets/animated stats, modal-based asset detail/music, and invest flow using mock data.
  */
 function InvestorDashboard() {
-  // Use mockAssets for owned assets, and mockTransactions for activity
-  // State to control modal open/close and selected asset for investing
+  // Dashboard tabs: "assets" | "transactions"
+  const [activeTab, setActiveTab] = useState("assets");
+  // Asset Invest modal and detail/modal logic
   const [showInvest, setShowInvest] = useState(false);
   const [selectedAsset, setSelectedAsset] = useState(null);
+  const [showDetail, setShowDetail] = useState(false);
+  const [detailAsset, setDetailAsset] = useState(null);
+  const [showMusicModal, setShowMusicModal] = useState(false);
+  const [musicAsset, setMusicAsset] = useState(null);
 
+  // Asset cards and footer: Include invest more, modal logic
   const ownedAssets = mockAssets.slice(0, 3).map(asset => {
-    // Hook up "Invest More" button to open InvestModal with asset details
     const investBtn = (
       <GradientButton
         style={{ marginTop: 12, minWidth: 0 }}
@@ -75,26 +83,107 @@ function InvestorDashboard() {
         </div>
       ),
       onClick: () => {
-        // Optionally, could also open Invest modal from card if desired
-        setSelectedAsset(asset);
-        setShowInvest(true);
+        setDetailAsset(asset);
+        setShowDetail(true);
       },
     };
   });
 
   const transactions = mockTransactions;
 
-  // Overall animated stats (computed examples)
+  // Animated stats
   const totalInvested = transactions.filter(tx => tx.type === "Purchase").reduce((sum, tx) => sum + tx.amount, 0);
   const estAnnualReturn = ownedAssets.reduce((sum, a) => sum + (a.estRoyalty || 0) * 200, 0); // Fake formula
   const assetsCount = ownedAssets.length;
-
-  // NavBar links reused for consistency
+  // NavBar links reused
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "Marketplace", href: "/marketplace" },
     { label: "Creator", href: "/creator" },
     { label: "Investor", href: "/investor" }
+  ];
+
+  // Modal: detail for owned asset (SPA modal, not page navigation)
+  const renderDetailModal = () => (
+    <Modal
+      open={showDetail}
+      onClose={() => { setShowDetail(false); setDetailAsset(null); }}
+      maxWidth="470px"
+    >
+      {detailAsset && (
+        <div>
+          <h2 style={{ color: "#FFD700", marginBottom: 6 }}>
+            {detailAsset.title}
+          </h2>
+          <img src={detailAsset.image} alt={detailAsset.title} style={{
+            width: "85%",
+            borderRadius: 14,
+            objectFit: "cover",
+            maxHeight: 180,
+            marginBottom: 13,
+            marginLeft: "auto",
+            marginRight: "auto",
+            display: "block"
+          }} />
+          <div style={{
+            color: "#00FFC2",
+            fontWeight: 600,
+            fontSize: 15.2,
+            marginBottom: 6
+          }}>
+            {detailAsset.subtitle}
+          </div>
+          <div style={{ color: "#bab9e3", marginBottom: 6 }}>by {detailAsset.owner}</div>
+          <div style={{ marginBottom: 11 }}>
+            {detailAsset.badges}
+          </div>
+          {/* If music asset, preview button */}
+          {typeof detailAsset.subtitle === "string" && detailAsset.subtitle.toLowerCase().includes("music") && (
+            <GradientButton
+              wide
+              style={{marginBottom: 7}}
+              icon={<span style={{fontSize:19}}>🎵</span>}
+              onClick={() => { setShowMusicModal(true); setMusicAsset(detailAsset); }}
+            >Preview Music</GradientButton>
+          )}
+          <GradientButton
+            wide
+            style={{ marginTop: 2 }}
+            onClick={() => {
+              setShowDetail(false);
+              setTimeout(() => window.location.assign(`/ip/${detailAsset.id}`), 120);
+            }}
+          >
+            View Details
+          </GradientButton>
+        </div>
+      )}
+    </Modal>
+  );
+
+  // Modal for music preview
+  const renderMusicModal = () => (
+    <Modal
+      open={showMusicModal}
+      onClose={() => setShowMusicModal(false)}
+      maxWidth="355px"
+    >
+      {musicAsset && (
+        <div>
+          <MockAudioPlayer
+            title={typeof musicAsset.title === "string" ? musicAsset.title : "Music preview"}
+            autoPlay={false}
+          />
+          <GradientButton wide style={{marginTop: 15}} onClick={() => setShowMusicModal(false)}>Close</GradientButton>
+        </div>
+      )}
+    </Modal>
+  );
+
+  // TabBar options: "assets", "transactions"
+  const tabOptions = [
+    { label: "My Assets", value: "assets" },
+    { label: "Transactions", value: "transactions" }
   ];
 
   return (
@@ -135,7 +224,7 @@ function InvestorDashboard() {
             gap: 25,
             flexWrap: "wrap",
             justifyContent: "start",
-            marginBottom: 34,
+            marginBottom: 22,
             marginTop: 7
           }}
           initial="hidden"
@@ -243,108 +332,123 @@ function InvestorDashboard() {
             />
           </motion.div>
         </motion.div>
-        {/* Owned Assets Section */}
-        <motion.div
-          className="scroll-fade-in"
-          variants={fadeInUp}
-          initial="hidden"
-          animate="visible"
-          custom={0.25}
-        >
-          <div
+        {/* Dashboard Tabs */}
+        <div style={{marginBottom: 13, marginTop: 1 }}>
+          <TabSwitcher
+            tabs={tabOptions}
+            active={activeTab}
+            onTabSelect={setActiveTab}
+          />
+        </div>
+        {/* Assets tab - SPA modal click for more info or invest */}
+        {activeTab === "assets" && (
+          <motion.div
+            className="scroll-fade-in"
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            custom={0.25}
+          >
+            <div
+              style={{
+                fontWeight: 750,
+                fontSize: 19,
+                color: "#FFD700",
+                margin: "0 0 12px 3px",
+                textAlign: "left"
+              }}
+            >
+              Owned Assets
+            </div>
+            <div className="asset-grid">
+              {ownedAssets.length === 0 ? (
+                <div style={{
+                  fontSize: 20,
+                  color: "#00FFC2AA",
+                  textAlign: "center",
+                  width: "100%",
+                  padding: "2em 0"
+                }}>No owned assets yet.</div>
+              ) : ownedAssets.map((asset, i) => (
+                <AssetCard
+                  key={asset.title + "-" + i}
+                  {...asset}
+                  onClick={() => { setDetailAsset(asset); setShowDetail(true); }}
+                />
+              ))}
+            </div>
+          </motion.div>
+        )}
+        {/* Transactions tab */}
+        {activeTab === "transactions" && (
+          <motion.div
+            className="scroll-fade-in"
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            custom={0.36}
             style={{
-              fontWeight: 750,
-              fontSize: 19,
-              color: "#FFD700",
-              margin: "0 0 12px 3px",
-              textAlign: "left"
+              marginTop: 10,
+              background: "linear-gradient(113deg,#181828a7 35%,#FFD70007 100%)",
+              borderRadius: 19,
+              boxShadow: "0 2px 28px #FFD70009, 0 1.5px 6px #00FFC220",
+              padding: "23px 12px 16px 12px",
+              overflowX: "auto"
             }}
           >
-            Owned Assets
-          </div>
-          <div className="asset-grid">
-            {ownedAssets.length === 0 ? (
-              <div style={{
-                fontSize: 20,
-                color: "#00FFC2AA",
-                textAlign: "center",
-                width: "100%",
-                padding: "2em 0"
-              }}>No owned assets yet.</div>
-            ) : ownedAssets.map((asset, i) => (
-              <AssetCard
-                key={asset.title + "-" + i}
-                {...asset}
-                onClick={() => window.location.assign(`/ip/${mockAssets[i]?.id || "detail"}`)}
-              />
-            ))}
-          </div>
-        </motion.div>
-        {/* Transaction History */}
-        <motion.div
-          className="scroll-fade-in"
-          variants={fadeInUp}
-          initial="hidden"
-          animate="visible"
-          custom={0.36}
-          style={{
-            marginTop: 38,
-            background: "linear-gradient(113deg,#181828a7 35%,#FFD70007 100%)",
-            borderRadius: 19,
-            boxShadow: "0 2px 28px #FFD70009, 0 1.5px 6px #00FFC220",
-            padding: "23px 12px 16px 12px",
-            overflowX: "auto"
-          }}
-        >
-          <div style={{
-            fontWeight: 700,
-            fontSize: 17,
-            color: "#FFD700",
-            margin: "0 0 11px 0",
-            textAlign: "left"
-          }}>Transaction History</div>
-          <table style={{
-            width: "100%",
-            borderCollapse: "collapse",
-            color: "#fff",
-            fontSize: 15.1,
-            minWidth: 320
-          }}>
-            <thead>
-              <tr style={{ borderBottom: "1.1px solid #FFD70022" }}>
-                <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Date</th>
-                <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Type</th>
-                <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Asset</th>
-                <th style={{ textAlign: "right", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Amount</th>
-                <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Details</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((tx, i) => (
-                <tr key={i} style={{
-                  background: i % 2 === 0 ? "rgba(32,32,64,0.13)" : "transparent"
-                }}>
-                  <td style={{ padding: "6px 0", color: "#bab9e3" }}>{tx.date}</td>
-                  <td style={{ padding: "6px 0", color: tx.color, fontWeight: 700 }}>{tx.type}</td>
-                  <td style={{ padding: "6px 0" }}>{tx.asset}</td>
-                  <td style={{ padding: "6px 0", color: "#FFD700", textAlign: "right" }}>{tx.type === "Purchase" ? <>-${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</> : <>+${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</>}</td>
-                  <td style={{ padding: "6px 0", color: "#b0afff" }}>{tx.details}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {transactions.length === 0 && (
             <div style={{
-              marginTop: 14,
-              textAlign: "center",
-              color: "#00FFC2CC",
-              fontSize: 16
-            }}>No transactions yet.</div>
-          )}
-        </motion.div>
+              fontWeight: 700,
+              fontSize: 17,
+              color: "#FFD700",
+              margin: "0 0 11px 0",
+              textAlign: "left"
+            }}>Transaction History</div>
+            <table style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              color: "#fff",
+              fontSize: 15.1,
+              minWidth: 320
+            }}>
+              <thead>
+                <tr style={{ borderBottom: "1.1px solid #FFD70022" }}>
+                  <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Date</th>
+                  <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Type</th>
+                  <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Asset</th>
+                  <th style={{ textAlign: "right", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Amount</th>
+                  <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {transactions.map((tx, i) => (
+                  <tr key={i} style={{
+                    background: i % 2 === 0 ? "rgba(32,32,64,0.13)" : "transparent"
+                  }}>
+                    <td style={{ padding: "6px 0", color: "#bab9e3" }}>{tx.date}</td>
+                    <td style={{ padding: "6px 0", color: tx.color, fontWeight: 700 }}>{tx.type}</td>
+                    <td style={{ padding: "6px 0" }}>{tx.asset}</td>
+                    <td style={{ padding: "6px 0", color: "#FFD700", textAlign: "right" }}>{tx.type === "Purchase" ? <>-${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</> : <>+${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</>}</td>
+                    <td style={{ padding: "6px 0", color: "#b0afff" }}>{tx.details}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            {transactions.length === 0 && (
+              <div style={{
+                marginTop: 14,
+                textAlign: "center",
+                color: "#00FFC2CC",
+                fontSize: 16
+              }}>No transactions yet.</div>
+            )}
+          </motion.div>
+        )}
       </section>
-      {/* Responsive adjustment for mobile/tablet */}
-      {/* Responsiveness now handled by global App.css media queries */}
+      {/* Asset detail modal */}
+      {renderDetailModal()}
+      {/* Music preview modal */}
+      {renderMusicModal()}
+
       <InvestModal
         open={showInvest}
         onClose={() => setShowInvest(false)}

@@ -1,37 +1,69 @@
-import React from "react";
+import React, { useState } from "react";
 import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
 import AnimatedCounter from "../components/AnimatedCounter";
 import GradientButton from "../components/GradientButton";
+import Modal from "../components/Modal";
+import TabSwitcher from "../components/TabSwitcher";
+import MockAudioPlayer from "../components/MockAudioPlayer";
 import { motion } from "framer-motion";
 import { fadeInUp } from "../utils/animationPresets";
 import mockAssets from "../data/mockAssets";
 
-// PUBLIC_INTERFACE
 /**
  * CreatorDashboard - Displays the creator's uploaded IP assets and animated statistics.
  * Sections:
+ * - Tabbed interface: "All Assets", "Music", future: "Stats/Analytics"
  * - Animated summary stats (earnings, % sold, num assets)
- * - Grid of asset cards built from dummy/mock data module
+ * - Grid of asset cards built from dummy/mock data module (with music tab only music assets)
+ * - Detail Modal: asset drill down (with mock music player for music assets)
  * - Uses glassmorphism, reusable AssetCard, AnimatedCounter, GradientButton
  */
 
 function CreatorDashboard() {
-  // Only show assets owned by 'You' (for mockup, let's simulate all as yours for now)
-  // In a real app, filter: asset => asset.owner === current user.
+  // Tabbed view state
+  const [activeTab, setActiveTab] = useState("all");
+  // Asset detail modal state
+  const [showDetail, setShowDetail] = useState(false);
+  const [detailAsset, setDetailAsset] = useState(null);
+  // Music preview modal subview state
+  const [showMusicModal, setShowMusicModal] = useState(false);
+  const [musicAsset, setMusicAsset] = useState(null);
+
+  // Prepare assets for view (filter for tabs "all"/"music")
   const assets = mockAssets.map(asset => ({
     ...asset,
-    owner: "You", // for creator context
+    owner: "You",
     badges: [
-      <span key={"sold-" + asset.id} className="asset-subtitle" style={{ background: asset.badges[0].style.background, padding: "4px 10px", borderRadius: "9px", fontWeight: 700, fontSize: 13 }}>
+      <span key={"sold-" + asset.id} className="asset-subtitle" style={{
+        background: asset.badges[0].style.background,
+        padding: "4px 10px",
+        borderRadius: "9px",
+        fontWeight: 700,
+        fontSize: 13
+      }}>
         {Math.round(asset.ownership * 100)}% Sold
       </span>,
-      <span key={"earned-" + asset.id} style={{ background: "rgba(255,215,0,0.13)", padding: "4px 9px", borderRadius: "9px", fontWeight: 700, fontSize: 12, color: "#FFD700" }}>
+      <span key={"earned-" + asset.id}
+        style={{
+          background: "rgba(255,215,0,0.13)",
+          padding: "4px 9px",
+          borderRadius: "9px",
+          fontWeight: 700,
+          fontSize: 12,
+          color: "#FFD700"
+        }}>
         ${asset.stats.userEarnings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
         {" "}Earned
       </span>
     ]
   }));
+
+  // Tab Filters
+  let filteredAssets = assets;
+  if (activeTab === "music") {
+    filteredAssets = assets.filter(a => typeof a.subtitle === "string" && a.subtitle.toLowerCase().includes("music"));
+  }
 
   // Mock stats, derived from assets above
   const totalEarnings = assets.reduce((sum, asset) => sum + (asset.stats.userEarnings || 0), 0);
@@ -75,7 +107,88 @@ function CreatorDashboard() {
     },
   ];
 
-  // Animation variants are now imported from animationPresets.js
+  // Tab options
+  const tabOptions = [
+    { label: "All Assets", value: "all" },
+    { label: "Music", value: "music" },
+  ];
+
+  // Render detail modal
+  const renderDetailModal = () => (
+    <Modal
+      open={showDetail}
+      onClose={() => { setShowDetail(false); setDetailAsset(null); }}
+      maxWidth="480px"
+    >
+      {detailAsset && (
+        <div>
+          <h2 style={{ color: "#FFD700", marginBottom: 7 }}>
+            {detailAsset.title}
+          </h2>
+          <img src={detailAsset.image} alt={detailAsset.title} style={{
+            width: "85%",
+            borderRadius: 14,
+            objectFit: "cover",
+            maxHeight: 180,
+            marginBottom: 13,
+            marginLeft: "auto",
+            marginRight: "auto",
+            display: "block"
+          }} />
+          <div style={{
+            color: "#00FFC2",
+            fontWeight: 600,
+            fontSize: 15.2,
+            marginBottom: 6
+          }}>
+            {detailAsset.subtitle}
+          </div>
+          <div style={{ color: "#bab9e3", marginBottom: 6 }}>by {detailAsset.owner}</div>
+          <div style={{ marginBottom: 11 }}>
+            {detailAsset.badges}
+          </div>
+          {/* If music type, show mock 'Play Music' button */}
+          {typeof detailAsset.subtitle === "string" && detailAsset.subtitle.toLowerCase().includes("music") && (
+            <GradientButton
+              wide
+              style={{marginBottom: 7}}
+              icon={<span style={{fontSize:19}}>🎵</span>}
+              onClick={() => { setShowMusicModal(true); setMusicAsset(detailAsset); }}
+            >Preview Music</GradientButton>
+          )}
+          <GradientButton
+            wide
+            style={{ marginTop: 2 }}
+            onClick={() => {
+              setShowDetail(false);
+              setTimeout(() => window.location.assign(`/ip/${detailAsset.id}`), 120);
+            }}
+          >
+            View Details
+          </GradientButton>
+        </div>
+      )}
+    </Modal>
+  );
+
+  // Music Preview Modal
+  const renderMusicModal = () => (
+    <Modal
+      open={showMusicModal}
+      onClose={() => setShowMusicModal(false)}
+      maxWidth="355px"
+    >
+      {musicAsset && (
+        <div>
+          <MockAudioPlayer
+            title={typeof musicAsset.title === "string" ? musicAsset.title : "Music preview"}
+            autoPlay={false}
+          />
+          <GradientButton wide style={{marginTop: 15}} onClick={() => setShowMusicModal(false)}>Close</GradientButton>
+        </div>
+      )}
+    </Modal>
+  );
 
   return (
     <>
@@ -115,7 +228,7 @@ function CreatorDashboard() {
             gap: 31,
             flexWrap: "wrap",
             justifyContent: "start",
-            marginBottom: 38,
+            marginBottom: 35,
             marginTop: 9
           }}
           initial="hidden"
@@ -163,6 +276,14 @@ function CreatorDashboard() {
             </motion.div>
           ))}
         </motion.div>
+        {/* Tabs for asset types (all/music etc) */}
+        <div style={{ marginBottom: 14, marginTop: 5 }}>
+          <TabSwitcher
+            tabs={tabOptions}
+            active={activeTab}
+            onTabSelect={setActiveTab}
+          />
+        </div>
         {/* Assets Uploaded Section */}
         <motion.div
           className="scroll-fade-in"
@@ -180,10 +301,10 @@ function CreatorDashboard() {
               textAlign: "left"
             }}
           >
-            Uploaded Assets
+            {activeTab === "music" ? "My Music Assets" : "Uploaded Assets"}
           </div>
           <div className="asset-grid">
-            {assets.length === 0 ? (
+            {filteredAssets.length === 0 ? (
               <div style={{
                 fontSize: 20,
                 color: "#00FFC2AA",
@@ -191,11 +312,12 @@ function CreatorDashboard() {
                 width: "100%",
                 padding: "2em 0"
               }}>No assets uploaded yet.</div>
-            ) : assets.map((asset, i) => (
+            ) : filteredAssets.map((asset, i) => (
               <AssetCard
                 key={asset.title + "-" + i}
                 {...asset}
-                onClick={() => window.location.assign(`/ip/${mockAssets[i]?.id || "detail"}`)}
+                // Modal view for asset details
+                onClick={() => { setDetailAsset(asset); setShowDetail(true); }}
               />
             ))}
           </div>
@@ -214,8 +336,12 @@ function CreatorDashboard() {
           </GradientButton>
         </motion.div>
       </section>
-      {/* Responsive mobile adjustment */}
-      {/* (App-wide responsive styles are now handled globally in App.css) */}
+
+      {/* Asset detail modal */}
+      {renderDetailModal()}
+
+      {/* Subview modal for music preview, if any */}
+      {renderMusicModal()}
     </>
   );
 }
