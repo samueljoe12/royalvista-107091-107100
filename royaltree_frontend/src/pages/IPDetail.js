@@ -8,6 +8,7 @@ import AnimatedCounter from "../components/AnimatedCounter";
 import { motion } from "framer-motion";
 import { fadeInUp } from "../utils/animationPresets";
 import mockAssets from "../data/mockAssets";
+import MockAudioPlayer from "../components/MockAudioPlayer";
 
 // PUBLIC_INTERFACE
 /**
@@ -114,92 +115,14 @@ function IPDetail() {
                 }
                 onClick={null}
               />
-              {/* Audio or Visual Mockup Under Card (if audio asset) */}
+              {/* Modern Mock Audio Player, only for music/audio assets */}
               {isAudio && (
-                <motion.div
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  style={{
-                    margin: "21px auto 0 auto",
-                    width: "95%",
-                    borderRadius: 12,
-                    background: "linear-gradient(125deg,#19192aee 77%,#FFD70015)",
-                    boxShadow: "0 2px 22px #FFD70014,0 1px 7px #00FFC228",
-                    padding: "17px 11px 13px 11px",
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "center"
-                  }}
-                >
-                  {/* Audio mock: visual track and play button */}
-                  <div style={{
-                    display: "flex", alignItems: "center", gap: 14,
-                    marginBottom: 7
-                  }}>
-                    <span
-                      style={{
-                        display: "inline-block",
-                        width: 44,
-                        height: 44,
-                        borderRadius: "50%",
-                        background: "linear-gradient(90deg,#FFD700 35%,#00FFC2 80%)",
-                        boxShadow: "0 0 18px #FFD70060,0 1px 5px #00FFC220",
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: 28,
-                        color: "#181828",
-                        cursor: "not-allowed",
-                        userSelect: "none"
-                      }}
-                    >
-                      <span style={{ marginLeft: 5 }}>▶</span>
-                    </span>
-                    {/* Track visual */}
-                    <div style={{
-                      width: 170,
-                      height: 20,
-                      borderRadius: 17,
-                      background: "linear-gradient(90deg,#FFD70011 10%,#00FFC223 98%)",
-                      position: "relative",
-                      overflow: "hidden",
-                    }}>
-                      {[...Array(12)].map((_, i) => (
-                        <span
-                          key={i}
-                          style={{
-                            display: "inline-block",
-                            width: 8,
-                            height: `${18 - Math.abs(i - 5) * 3}px`,
-                            background: "#FFD70099",
-                            borderRadius: 5,
-                            margin: "0 2px",
-                            opacity: 0.7 - Math.abs(i - 5) * 0.07
-                          }}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                  <div style={{
-                    color: "#FFD700",
-                    fontWeight: 700,
-                    fontSize: 13,
-                    letterSpacing: 0.01,
-                    marginBottom: 2
-                  }}>
-                    Music Preview (Demo Only)
-                  </div>
-                  <div style={{
-                    color: "#bab9e3",
-                    fontSize: 13,
-                    marginBottom: -3,
-                    marginTop: -4,
-                    opacity: 0.74
-                  }}>
-                    Full playback coming soon!
-                  </div>
-                </motion.div>
+                <div style={{ marginTop: 22, marginBottom: 1 }}>
+                  <MockAudioPlayer
+                    title={typeof asset.title === "string" ? asset.title : "Music Preview"}
+                    autoPlay={false}
+                  />
+                </div>
               )}
             </div>
             {/* RIGHT: Royalty Chart, Ownership, Invest */}
