@@ -88,6 +88,36 @@ function NavBar({ links = [], logoSrc, brandName, rightSection, geoData }) {
             {label}
           </motion.a>
         ))}
+        {/* IP Detail placeholder nav link */}
+        <motion.span
+          key="ip-detail-placeholder"
+          title="IP Detail (Coming Soon)"
+          style={{
+            color: "#bab9e3",
+            background: "linear-gradient(90deg,#FFD70044 18%,#00FFC219 81%)",
+            opacity: 0.66,
+            fontWeight: 600,
+            fontSize: 16.5,
+            letterSpacing: "0.01em",
+            padding: "6px 13px",
+            borderRadius: 7,
+            border: "1.3px dashed #FFD70066",
+            cursor: "not-allowed",
+            transition: "background 0.18s",
+            marginLeft: 2,
+            userSelect: "none",
+            display: "inline-block",
+            textShadow: "0 0 5px #FFD70022"
+          }}
+          whileHover={{
+            scale: 1.04,
+            background: "linear-gradient(90deg,#FFD70066,#00FFC238)",
+            color: "#FFD700"
+          }}
+          aria-disabled="true"
+        >
+          IP Detail
+        </motion.span>
       </div>
       {rightSection
         ? (
