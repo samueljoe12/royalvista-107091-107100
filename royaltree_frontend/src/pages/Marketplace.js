@@ -102,8 +102,8 @@ function Marketplace() {
           <span style={{ color: "#FFD700", fontWeight: 600, fontSize: 15.2 }}>
             Available Ownership
             <span style={{ color: "#00FFC2", marginLeft: 9 }}>
-              {typeof ownershipPercent === "number"
-                ? (100 - ownershipPercent) + "%"
+              {typeof ownershipPercent === "number" && !isNaN(ownershipPercent)
+                ? Math.max(0, Math.min(100, 100 - ownershipPercent)) + "%"
                 : "--"}
             </span>
           </span>
