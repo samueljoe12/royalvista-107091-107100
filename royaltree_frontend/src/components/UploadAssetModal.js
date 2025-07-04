@@ -268,31 +268,70 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
     );
   }
 
-  // Modal layout: glass, animated, responsive
+  // Modal layout: glass, animated, fully-fit and scrollable inside modal body
   return (
     <Modal open={isOpen} onClose={handleClose} maxWidth="480px">
-      <form
-        className="upload-asset-form"
+      <div
+        className="upload-asset-modal-container"
         style={{
-          minWidth: 260,
-          maxWidth: 440,
-          width: "97vw",
-          background: "rgba(24,26,34,0.74)",
-          borderRadius: 22,
-          boxShadow: "0 8px 56px rgba(0,0,0,0.27)",
-          padding: "1.75rem 1.4rem 1.25rem 1.4rem",
-          backdropFilter: "blur(18px)",
-          position: "relative",
-          color: "#fff",
-          margin: "0 auto",
-          overflowY: "auto",
-          overscrollBehavior: "contain",
+          // Modal container flexes to viewport height: header and footer locked, body scrolls
           display: "flex",
           flexDirection: "column",
+          // 86vh ensures safe fit around mobile nav bars and browser banners
+          maxHeight: "86vh",
+          minHeight: "min(440px, 80vh)",
+          width: "100%",
         }}
-        onSubmit={handleUpload}
-        autoComplete="off"
       >
+        {/* Modal Header (locked) */}
+        <div
+          className="upload-asset-modal-header"
+          style={{
+            flex: "0 0 auto",
+            paddingBottom: 0,
+            background: "none",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: 24,
+              fontWeight: 800,
+              color: "#FFD700",
+              letterSpacing: "1px",
+              textAlign: "center",
+              margin: "0 0 14px 0",
+              textShadow: "0 0 9px #282829, 0 2px 12px #FFD70033",
+            }}
+          >
+            Upload Asset
+          </h2>
+        </div>
+        {/* Modal Body (scrollable) */}
+        <form
+          className="upload-asset-form"
+          style={{
+            minWidth: 0,
+            maxWidth: 440,
+            width: "100%",
+            background: "rgba(24,26,34,0.74)",
+            borderRadius: 22,
+            boxShadow: "0 8px 56px rgba(0,0,0,0.20)",
+            padding: "0 1.4rem 0.2rem 1.4rem",
+            backdropFilter: "blur(18px)",
+            position: "relative",
+            color: "#fff",
+            margin: "0 auto",
+            flex: "1 1 auto",
+            overflowY: "auto",
+            overscrollBehavior: "contain",
+            display: "flex",
+            flexDirection: "column",
+            // space out fields for actions area
+            justifyContent: "flex-start",
+          }}
+          onSubmit={handleUpload}
+          autoComplete="off"
+        >
         <h2
           style={{
             fontSize: 24,
@@ -480,13 +519,26 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
         )}
 
         {/* 9. Actions */}
+        {/* Moved below form, rendered outside the scrollable body for persistent accessibility */}
+        </form>
         <div
+          className="upload-asset-modal-footer"
           style={{
+            flex: "0 0 auto",
+            position: "sticky",
+            bottom: 0,
+            background: "rgba(24,26,34,0.95)",
+            padding: "12px 1.6rem 0.6rem 1.6rem",
+            borderBottomLeftRadius: 22,
+            borderBottomRightRadius: 22,
+            width: "100%",
+            zIndex: 9,
             display: "flex",
-            flexDirection: "row",
             justifyContent: "space-between",
-            marginTop: 8,
             gap: 13,
+            boxShadow: "0 -8px 30px #13172955",
+            margin: "0 auto",
+            minHeight: "65px"
           }}
         >
           <GradientButton
@@ -510,17 +562,22 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
               !formData.estimatedRoyalty ||
               !formData.file
             }
+            onClick={e => {
+              // Forward submit to form if enabled
+              const form = document.querySelector('.upload-asset-form');
+              if (form) form.requestSubmit && form.requestSubmit();
+            }}
           >
             Upload
           </GradientButton>
         </div>
-      </form>
-      {/* Responsive scroll styling for modal */}
+      </div>
+      {/* Responsive & modal container scroll/fix styles */}
       <style>{`
         @keyframes fadeInPop {
-          0% { opacity: 0; transform: scale(0.89) translateY(27px);}
-          80% { opacity: 1; transform: scale(1.09) translateY(-8px);}
-          100% { opacity: 1; transform: scale(1) translateY(0);}
+          0% { opacity: 0; transform: scale(0.89) translateY(27px); }
+          80% { opacity: 1; transform: scale(1.09) translateY(-8px); }
+          100% { opacity: 1; transform: scale(1) translateY(0); }
         }
         .upload-asset-form::-webkit-scrollbar {
           width: 7px;
@@ -530,21 +587,45 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
           background: #222b;
           border-radius: 8px;
         }
+        .upload-asset-modal-container {
+          max-height: 86vh !important;
+        }
+        .upload-asset-form {
+          scrollbar-gutter: stable;
+          overscroll-behavior: contain;
+        }
+        .upload-asset-modal-footer {
+          /* On mobile, footer always visible and sticks to bottom edge of modal */
+        }
         @media (max-width: 540px) {
+          .upload-asset-modal-container {
+            min-height: 0 !important;
+            max-height: 98vh !important;
+            border-radius: 12px !important;
+          }
           .upload-asset-form {
             max-width: 100vw !important;
             min-width: unset !important;
-            padding: 1.1rem 0.23rem 0.67rem !important;
-            border-radius: 14px !important;
-            box-shadow: 0 0 32px #FFD70022;
+            padding: 0.9rem 0.13rem 0.37rem !important;
+            border-radius: 10px !important;
+            box-shadow: 0 0 19px #FFD70018;
             font-size: 15.1px;
+          }
+          .upload-asset-modal-footer {
+            border-radius: 0 0 14px 14px!important;
+            padding: 9px 0.5rem 0.4rem 0.5rem !important;
+          }
+        }
+        @media (max-width: 420px) {
+          .upload-asset-form, .upload-asset-modal-footer {
+            font-size: 12.9px !important;
           }
         }
         @media (max-width: 378px) {
           .upload-asset-form {
-            padding: 0.48rem 0.05rem 0.2rem !important;
-            border-radius: 8px !important;
-            font-size: 13.4px;
+            padding: 0.48rem 0.03rem 0.07rem !important;
+            border-radius: 6px !important;
+            font-size: 12.2px;
           }
         }
       `}</style>
