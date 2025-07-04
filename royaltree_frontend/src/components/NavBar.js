@@ -2,15 +2,40 @@ import React from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 
-// PUBLIC_INTERFACE
 /**
  * NavBar - Futuristic glassmorphism navigation bar.
  * @param {Array} links Array of link objects: [{ label: string, href: string }]
  * @param {string} logoSrc Path or URL of logo image
  * @param {string} brandName Brand or app name for the left section
  * @param {React.Component} rightSection Optional right content (e.g. profile, theme toggle)
+ * @param {object} geoData Optional: { city, country, region, ip, loading, error }
+ *
+ * If rightSection is not provided but geoData is, renders geolocation greeting in right corner.
  */
-function NavBar({ links = [], logoSrc, brandName, rightSection }) {
+function NavBar({ links = [], logoSrc, brandName, rightSection, geoData }) {
+  // Custom greeting if geoData, else rightSection
+  let geoSection = null;
+  if (geoData) {
+    if (geoData.loading) {
+      geoSection = <span style={{
+        fontSize: 15, color: "#bab9e3", fontWeight: 500, opacity: 0.82
+      }}>Locating…</span>;
+    } else if (geoData.error) {
+      geoSection = <span style={{
+        fontSize: 15, color: "#bab9e3", fontWeight: 500, opacity: 0.78
+      }}>Hi&nbsp;there!</span>;
+    } else if (geoData.city || geoData.country) {
+      geoSection = (
+        <span style={{ fontSize: 15, color: "#FFD700", fontWeight: 600, background: "rgba(0,255,194,0.09)", borderRadius: 8, padding: "7px 13px", boxShadow: "0 1px 7px #FFD70022" }}>
+          {geoData.city ? `Hi, ${geoData.city}! ` : "Welcome!"}
+          {geoData.ip && <span style={{ color: "#bab9e3", fontWeight: 500, marginLeft: 8 }}>({geoData.ip}</span>}
+          {geoData.country && <span style={{ color: "#00FFC2", fontWeight: 800 }}>{geoData.country}</span>}
+          {geoData.ip && <span style={{ color: "#bab9e3" }}>)</span>}
+        </span>
+      );
+    }
+  }
+
   return (
     <nav
       className="navbar-glass"
@@ -64,12 +89,20 @@ function NavBar({ links = [], logoSrc, brandName, rightSection }) {
           </motion.a>
         ))}
       </div>
-      {rightSection && (
-        <motion.div
-          initial={{ x: 40, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-        >{rightSection}</motion.div>
-      )}
+      {rightSection
+        ? (
+          <motion.div
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+          >{rightSection}</motion.div>
+        )
+        : (geoSection &&
+          <motion.div
+            initial={{ x: 40, opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+          >{geoSection}</motion.div>
+        )
+      }
     </nav>
   );
 }

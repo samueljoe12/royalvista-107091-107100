@@ -4,6 +4,8 @@ import NavBar from "../components/NavBar";
 import GradientButton from "../components/GradientButton";
 import AssetCard from "../components/AssetCard";
 
+/** Accepts geoData? For NavBar geolocation greeting use. */
+
 // PUBLIC_INTERFACE
 /**
  * LandingPage - Modern animated Royaltree hero section.
@@ -101,7 +103,7 @@ function LandingPage() {
 
   return (
     <>
-      <NavBar brandName="Royaltree" links={navLinks} />
+      <NavBar brandName="Royaltree" links={navLinks} geoData={typeof window !== "undefined" && typeof arguments !== "undefined" && arguments.length && arguments[0] && arguments[0].geoData ? arguments[0].geoData : undefined} />
       {/* Animated Hero Section */}
       <section className="kavia-container" style={{paddingTop:36,paddingBottom:7}}>
         <motion.div
