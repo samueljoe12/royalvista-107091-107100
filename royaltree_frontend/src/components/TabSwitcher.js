@@ -1,17 +1,17 @@
 import React from "react";
-import { motion, AnimateSharedLayout } from "framer-motion";
+import { motion, LayoutGroup } from "framer-motion";
 import PropTypes from "prop-types";
 
 // PUBLIC_INTERFACE
 /**
- * TabSwitcher - Glassmorphic tab component with animated indicator.
+ * TabSwitcher - Glassmorphic tab component with animated indicator (Framer Motion v5+).
  * @param {Array} tabs [{label, value}]
  * @param {string} active Value of current tab
  * @param {Function} onTabSelect Callback when tab changed
  */
 function TabSwitcher({ tabs, active, onTabSelect }) {
   return (
-    <AnimateSharedLayout>
+    <LayoutGroup>
       <div style={{
         display: "flex",
         gap: 16,
@@ -36,6 +36,7 @@ function TabSwitcher({ tabs, active, onTabSelect }) {
               position: "relative",
               transition: "color .18s"
             }}
+            layout
           >
             {tab.label}
             {active === tab.value && (
@@ -57,7 +58,7 @@ function TabSwitcher({ tabs, active, onTabSelect }) {
           </motion.button>
         ))}
       </div>
-    </AnimateSharedLayout>
+    </LayoutGroup>
   );
 }
 
