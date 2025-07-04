@@ -117,11 +117,58 @@ function IPDetail() {
               />
               {/* Modern Mock Audio Player, only for music/audio assets */}
               {isAudio && (
-                <div style={{ marginTop: 22, marginBottom: 1 }}>
+                <div
+                  style={{
+                    marginTop: 24,
+                    marginBottom: 6,
+                    display: "flex",
+                    justifyContent: "center",
+                  }}
+                >
                   <MockAudioPlayer
                     title={typeof asset.title === "string" ? asset.title : "Music Preview"}
                     autoPlay={false}
+                    // Use additional props if expand in future; the player manages mock state internally
                   />
+                  {/* Callout: visually link this as a music/audio preview */}
+                  <div
+                    style={{
+                      marginLeft: 16,
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      alignItems: "start",
+                      minWidth: 40,
+                      gap: 3,
+                    }}
+                  >
+                    <span
+                      style={{
+                        color: "#FFD700",
+                        fontWeight: 700,
+                        fontSize: 14.5,
+                        background: "rgba(255,215,0,0.09)",
+                        borderRadius: 8,
+                        padding: "5px 13px",
+                        letterSpacing: 0.01,
+                        boxShadow: "0 1px 7px #FFD70018",
+                      }}
+                    >
+                      Music Preview
+                    </span>
+                    <span
+                      style={{
+                        color: "#bab9e3",
+                        fontWeight: 500,
+                        fontSize: 12.5,
+                        opacity: 0.72,
+                        marginTop: 1.5,
+                        fontStyle: "italic",
+                      }}
+                    >
+                      Player is a simulation only
+                    </span>
+                  </div>
                 </div>
               )}
             </div>
