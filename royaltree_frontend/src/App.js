@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import useGeolocation from './hooks/useGeolocation';
 import PageTransition from './components/PageTransition'; // For route animations
+import NavBar from './components/NavBar'; // Always present NavBar at app-level
 import './utils/animationPresets'; // ensures side effect import makes presets available
 
 // Lazy imports for readability (can optimize with React.lazy later if needed)
@@ -32,19 +33,32 @@ function App() {
     setTheme(prevTheme => prevTheme === 'light' ? 'dark' : 'light');
   };
 
-  // Build geo-aware right section for NavBar globally
-  const geoRightSection = null; // Let NavBar handle greeting with geoData
+  // NavBar links, consistently passed everywhere
+  const navLinks = [
+    { label: "Home", href: "/" },
+    { label: "Marketplace", href: "/marketplace" },
+    { label: "Creator", href: "/creator" },
+    { label: "Investor", href: "/investor" }
+  ];
 
   return (
     <Router>
       <div className="App">
-        <button 
-          className="theme-toggle" 
-          onClick={toggleTheme}
-          aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-        >
-          {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
-        </button>
+        <NavBar
+          brandName="Royaltree"
+          links={navLinks}
+          geoData={geo}
+          rightSection={
+            <button
+              className="theme-toggle"
+              onClick={toggleTheme}
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              style={{ marginLeft: 9 }}
+            >
+              {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
+            </button>
+          }
+        />
         <Routes>
           <Route
             path="/"
@@ -70,7 +84,7 @@ function App() {
               </PageTransition>
             }
           />
-          {/* Add dedicated route for /ip-detail to support NavBar */}
+          {/* Dedicated route for /ip-detail for NavBar */}
           <Route
             path="/ip-detail"
             element={

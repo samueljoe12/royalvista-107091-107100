@@ -1,6 +1,5 @@
 import React from "react";
 import { motion, useAnimation, useInView } from "framer-motion";
-import NavBar from "../components/NavBar";
 import GradientButton from "../components/GradientButton";
 import AssetCard from "../components/AssetCard";
 import {
@@ -10,21 +9,19 @@ import {
 } from "../utils/animationPresets";
 import { useNavigate } from "react-router-dom";
 
-/** Accepts geoData? For NavBar geolocation greeting use. */
-
-// PUBLIC_INTERFACE
 /**
+ * PUBLIC_INTERFACE
  * LandingPage - Modern animated Royaltree hero section.
  * Features animated gradient heading, intro text, CTA buttons, and mock animated AssetCards.
  */
-function LandingPage() {
+function LandingPage({ geoData }) {
   const navigate = useNavigate();
 
   // Modal/playback state for mock audio feedback
   const [audioPlaying, setAudioPlaying] = React.useState(false);
   const [lastPlayed, setLastPlayed] = React.useState(null);
 
-  // Dummy asset card data for animated grid (add onClick and mock audio)
+  // AssetCard demo data, using interactive navigation and demo audio
   const assetMocks = [
     {
       image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=600&q=80",
@@ -87,18 +84,9 @@ function LandingPage() {
     if (isInView) controls.start("visible");
   }, [isInView, controls]);
 
-  // NavBar links
-  const navLinks = [
-    { label: "Home", href: "/" },
-    { label: "Marketplace", href: "/marketplace" },
-    { label: "Creator", href: "/creator" },
-    { label: "Investor", href: "/investor" }
-  ];
-
   return (
     <>
-      <NavBar brandName="Royaltree" links={navLinks} geoData={typeof window !== "undefined" && typeof arguments !== "undefined" && arguments.length && arguments[0] && arguments[0].geoData ? arguments[0].geoData : undefined} />
-      {/* Animated Hero Section */}
+      {/* Hero Section */}
       <section className="kavia-container" style={{paddingTop:36,paddingBottom:7}}>
         <motion.div
           className="hero-gradient-bg"
@@ -201,8 +189,9 @@ function LandingPage() {
               custom={0.22 + i*0.13}
               style={{display:"flex"}}
             >
-              {/* Pass audioDemo and onAudioDemoClick for music asset demo */}
-              <AssetCard {...asset} />
+              <AssetCard
+                {...asset}
+              />
             </motion.div>
           ))}
         </motion.div>
