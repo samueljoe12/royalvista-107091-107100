@@ -21,56 +21,56 @@ import mockAssets from "../data/mockAssets";
  */
 
 function CreatorDashboard() {
-  // Tabbed view state
+  // Tabbed view state and modal/asset management
   const [activeTab, setActiveTab] = useState("all");
-  // Asset detail modal state
   const [showDetail, setShowDetail] = useState(false);
   const [detailAsset, setDetailAsset] = useState(null);
-  // Music preview modal subview state
   const [showMusicModal, setShowMusicModal] = useState(false);
   const [musicAsset, setMusicAsset] = useState(null);
-
-  // Prepare assets for view (filter for tabs "all"/"music")
-  const assets = mockAssets.map(asset => ({
+  
+  // --- Asset view generation, with dynamic badges, for robust tab switching ---
+  // Show "all" or "music" in the current tab
+  const rawAssets = mockAssets.map(asset => ({
     ...asset,
     owner: "You",
     badges: [
       <span key={"sold-" + asset.id} className="asset-subtitle" style={{
-        background: asset.badges[0].style.background,
+        background: (asset.badges?.[0]?.style?.background) || "rgba(0,255,194,0.13)",
+        color: (asset.badges?.[0]?.style?.color) || "#00FFC2",
         padding: "4px 10px",
         borderRadius: "9px",
         fontWeight: 700,
         fontSize: 13
       }}>
-        {Math.round(asset.ownership * 100)}% Sold
+        {Math.round((asset.ownership ?? 0) * 100)}% Sold
       </span>,
       <span key={"earned-" + asset.id}
         style={{
           background: "rgba(255,215,0,0.13)",
+          color: "#FFD700",
           padding: "4px 9px",
           borderRadius: "9px",
           fontWeight: 700,
-          fontSize: 12,
-          color: "#FFD700"
+          fontSize: 12
         }}>
-        ${asset.stats.userEarnings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        ${asset.stats?.userEarnings?.toLocaleString(undefined, { minimumFractionDigits: 2 }) ?? "0.00"}
         {" "}Earned
       </span>
     ]
   }));
 
-  // Tab Filters
-  let filteredAssets = assets;
-  if (activeTab === "music") {
-    filteredAssets = assets.filter(a => typeof a.subtitle === "string" && a.subtitle.toLowerCase().includes("music"));
-  }
+  const assets = rawAssets;
+  const assetsMusic = rawAssets.filter(a => typeof a.subtitle === "string" && a.subtitle.toLowerCase().includes("music"));
 
-  // Mock stats, derived from assets above
-  const totalEarnings = assets.reduce((sum, asset) => sum + (asset.stats.userEarnings || 0), 0);
-  const soldPercent = assets.length
-    ? assets.reduce((sum, a) => sum + a.ownership, 0) / assets.length * 100
+  // Responsive tab filter: only update metrics & grid content that matches tab
+  let filteredAssets = activeTab === "music" ? assetsMusic : assets;
+
+  // --- Metrics: dynamically recalc based on tabbed content only ---
+  const totalEarnings = filteredAssets.reduce((sum, asset) => sum + (asset.stats?.userEarnings || 0), 0);
+  const soldPercent = filteredAssets.length
+    ? filteredAssets.reduce((sum, a) => sum + (a.ownership ?? 0), 0) / filteredAssets.length * 100
     : 0;
-  const numAssets = assets.length;
+  const numAssets = filteredAssets.length;
 
   // NavBar links (consistency across app)
   const navLinks = [

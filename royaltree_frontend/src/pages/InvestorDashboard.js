@@ -28,8 +28,11 @@ function InvestorDashboard() {
   const [showMusicModal, setShowMusicModal] = useState(false);
   const [musicAsset, setMusicAsset] = useState(null);
 
-  // Asset cards and footer: Include invest more, modal logic
-  const ownedAssets = mockAssets.slice(0, 3).map(asset => {
+  // --- Dynamic Owned Assets: Robust stat, click, badge, modal logic ---
+  // If "assets" tab, only display mock owned assets (slice for demo) and recalc metrics!
+
+  // Safely slice from mock data, bulletproof badge rendering
+  const ownedAssetsRaw = mockAssets.slice(0, 3).map(asset => {
     const investBtn = (
       <GradientButton
         style={{ marginTop: 12, minWidth: 0 }}
@@ -46,17 +49,17 @@ function InvestorDashboard() {
     );
     return {
       ...asset,
-      badges: asset.badges.map(b => (
+      badges: (asset.badges ?? []).map(b => (
         <span
           key={b.key + "-" + asset.id}
           className="asset-subtitle"
           style={{
-            background: b.style.background,
+            background: b.style?.background || "rgba(0,255,194,0.13)",
+            color: b.style?.color || "#00FFC2",
             padding: "4px 10px",
             borderRadius: "9px",
             fontWeight: 700,
-            fontSize: 13,
-            color: b.style.color
+            fontSize: 13
           }}
         >
           {b.text}
@@ -73,7 +76,7 @@ function InvestorDashboard() {
             Projected Returns
           </div>
           <AnimatedCounter
-            value={asset.stats.userEarnings * 0.43}
+            value={asset.stats?.userEarnings ? (asset.stats.userEarnings * 0.43) : 0}
             prefix="$"
             decimals={2}
             color="#FFD700"
@@ -88,13 +91,18 @@ function InvestorDashboard() {
       },
     };
   });
+  // Assets/transactions for tab views
+  const ownedAssets = activeTab === "assets" ? ownedAssetsRaw : [];
+  const transactions = activeTab === "transactions" ? mockTransactions : [];
 
-  const transactions = mockTransactions;
-
-  // Animated stats
-  const totalInvested = transactions.filter(tx => tx.type === "Purchase").reduce((sum, tx) => sum + tx.amount, 0);
-  const estAnnualReturn = ownedAssets.reduce((sum, a) => sum + (a.estRoyalty || 0) * 200, 0); // Fake formula
-  const assetsCount = ownedAssets.length;
+  // --- Animate stats based on currently active tab ---
+  // We want metrics to reflect the visible data for the tab
+  const statAssets = activeTab === "assets" ? ownedAssetsRaw : [];
+  const statTransactions = activeTab === "transactions" ? mockTransactions : [];
+  const totalInvested = (activeTab === "assets" ? mockTransactions : statTransactions)
+    .filter(tx => tx.type === "Purchase").reduce((sum, tx) => sum + tx.amount, 0);
+  const estAnnualReturn = statAssets.reduce((sum, a) => sum + ((a.estRoyalty || 0) * 200), 0); // Fake formula
+  const assetsCount = statAssets.length;
   // NavBar links reused
   const navLinks = [
     { label: "Home", href: "/" },
