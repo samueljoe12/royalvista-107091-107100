@@ -1,6 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
+import { cardHover } from "../utils/animationPresets";
 
 // PUBLIC_INTERFACE
 /**
@@ -18,11 +19,7 @@ function AssetCard({ image, title, subtitle, owner, badges = [], footer, onClick
     <motion.div
       className="asset-card-glass"
       onClick={onClick}
-      whileHover={onClick ? {
-        scale: 1.064,
-        boxShadow: "0 4px 36px #FFD70044, 0 1.5px 14px #00FFC277",
-        filter: "drop-shadow(0 0 19px #FFD70080)"
-      } : {}}
+      whileHover={onClick ? cardHover.hover : {}}
       style={{
         minWidth: 240,
         maxWidth: 340,

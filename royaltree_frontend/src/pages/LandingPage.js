@@ -3,6 +3,11 @@ import { motion, useAnimation, useInView } from "framer-motion";
 import NavBar from "../components/NavBar";
 import GradientButton from "../components/GradientButton";
 import AssetCard from "../components/AssetCard";
+import {
+  fadeInUp,
+  fadeIn,
+  growIn
+} from "../utils/animationPresets";
 
 /** Accepts geoData? For NavBar geolocation greeting use. */
 
@@ -56,34 +61,6 @@ function LandingPage() {
     }
   ];
 
-  // Animation variants
-  const heroVariants = {
-    hidden: { opacity: 0, y: 35 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.94, ease: [0.48,0.24,0.23,1], staggerChildren: 0.11 } }
-  };
-
-  const headingVariants = {
-    hidden: { opacity: 0, y: 34, scale:0.93 },
-    visible: { opacity: 1, y: 0, scale:1, transition: { duration: 0.84, delay: 0.09, ease: [0.66,0.13,0.35,0.99] } }
-  };
-
-  const textVariants = {
-    hidden: { opacity: 0, y: 17 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.63, delay: 0.16 } }
-  };
-
-  const btnVariants = {
-    hidden: { opacity: 0, y: 17, scale: 0.93 },
-    visible: i => ({
-      opacity: 1, y: 0, scale: 1, transition: { duration: 0.44 + i*0.11, delay: 0.21 + i*0.08 }
-    })
-  };
-
-  const assetGridVariants = {
-    hidden: { opacity: 0, y: 44, scale:0.97 },
-    visible: { opacity: 1, y: 0, scale:1, transition: { duration: 0.86, delay: 0.18 } }
-  };
-
   // Section animation hooks
   const ref = React.useRef(null);
   const isInView = useInView(ref, { amount: 0.2, once: true });
@@ -108,7 +85,7 @@ function LandingPage() {
       <section className="kavia-container" style={{paddingTop:36,paddingBottom:7}}>
         <motion.div
           className="hero-gradient-bg"
-          variants={heroVariants}
+          variants={growIn}
           initial="hidden"
           animate={controls}
           ref={ref}
@@ -120,7 +97,10 @@ function LandingPage() {
         >
           <motion.h1
             className="hero-title"
-            variants={headingVariants}
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            custom={0.09}
             style={{
               background: "linear-gradient(105deg, #FFD700 16%, #00FFC2 70%, #fff 110%)",
               WebkitBackgroundClip: "text",
@@ -137,7 +117,10 @@ function LandingPage() {
             Powering the <span style={{whiteSpace:"nowrap"}}>Future of IP</span> Ownership
           </motion.h1>
           <motion.div
-            variants={textVariants}
+            variants={fadeInUp}
+            initial="hidden"
+            animate="visible"
+            custom={0.15}
             className="subtitle"
             style={{
               fontSize: 20,
@@ -158,8 +141,12 @@ function LandingPage() {
               marginTop: 18,
               flexWrap: "wrap"
             }}
+            variants={fadeIn}
+            initial="hidden"
+            animate="visible"
+            custom={0.19}
           >
-            <motion.div custom={0} variants={btnVariants}>
+            <motion.div variants={growIn} custom={0.26} initial="hidden" animate="visible">
               <GradientButton
                 onClick={() => window.location.href = "/marketplace"}
                 wide
@@ -167,7 +154,7 @@ function LandingPage() {
                 Explore Marketplace
               </GradientButton>
             </motion.div>
-            <motion.div custom={1} variants={btnVariants}>
+            <motion.div variants={growIn} custom={0.32} initial="hidden" animate="visible">
               <GradientButton
                 onClick={() => window.location.href = "/creator"}
                 wide
@@ -183,16 +170,18 @@ function LandingPage() {
       <section>
         <motion.div
           className="asset-grid"
-          variants={assetGridVariants}
+          variants={fadeInUp}
           initial="hidden"
-          animate={controls}
+          animate={isInView ? "visible" : "hidden"}
+          custom={0.15}
         >
           {assetMocks.map((asset, i) => (
             <motion.div
               key={asset.title}
-              initial={{ opacity: 0, y: 37, scale: 0.98 }}
-              animate={isInView ? { opacity: 1, y: 0, scale: 1 } : {}}
-              transition={{ delay: 0.25 + i*0.13, duration: 0.77 }}
+              variants={growIn}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              custom={0.22 + i*0.13}
               style={{display:"flex"}}
             >
               <AssetCard {...asset} />

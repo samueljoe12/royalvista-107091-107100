@@ -3,6 +3,7 @@ import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
 import AnimatedCounter from "../components/AnimatedCounter";
 import { motion } from "framer-motion";
+import { fadeInUp } from "../utils/animationPresets";
 
 // PUBLIC_INTERFACE
 /**
@@ -193,15 +194,6 @@ function InvestorDashboard() {
   const estAnnualReturn = 1127.5;
   const assetsCount = ownedAssets.length;
 
-  // Fade in animation for sections
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 34 },
-    visible: (d = 0) => ({
-      opacity: 1, y: 0,
-      transition: { delay: d, duration: 0.77 }
-    })
-  };
-
   // NavBar links reused for consistency
   const navLinks = [
     { label: "Home", href: "/" },
@@ -213,7 +205,7 @@ function InvestorDashboard() {
   return (
     <>
       <NavBar brandName="Royaltree" links={navLinks} />
-      <section className="kavia-container" style={{paddingTop:36, paddingBottom:12, minHeight:180}}>
+      <section className="kavia-container" style={{ paddingTop: 36, paddingBottom: 12, minHeight: 180 }}>
         <motion.h1
           className="title"
           style={{
@@ -285,7 +277,7 @@ function InvestorDashboard() {
               prefix="$"
               decimals={2}
               color="#FFD700"
-              style={{fontSize:27, fontWeight:810, margin:"2px 0"}}
+              style={{ fontSize: 27, fontWeight: 810, margin: "2px 0" }}
             />
           </motion.div>
           <motion.div
@@ -319,7 +311,7 @@ function InvestorDashboard() {
               prefix="$"
               decimals={2}
               color="#00FFC2"
-              style={{fontSize:27, fontWeight:810, margin:"2px 0"}}
+              style={{ fontSize: 27, fontWeight: 810, margin: "2px 0" }}
             />
           </motion.div>
           <motion.div
@@ -352,7 +344,7 @@ function InvestorDashboard() {
               value={assetsCount}
               decimals={0}
               color="#b0afff"
-              style={{fontSize:27, fontWeight:810, margin:"2px 0"}}
+              style={{ fontSize: 27, fontWeight: 810, margin: "2px 0" }}
             />
           </motion.div>
         </motion.div>
@@ -421,11 +413,11 @@ function InvestorDashboard() {
           }}>
             <thead>
               <tr style={{ borderBottom: "1.1px solid #FFD70022" }}>
-                <th style={{textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600}}>Date</th>
-                <th style={{textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600}}>Type</th>
-                <th style={{textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600}}>Asset</th>
-                <th style={{textAlign: "right", paddingBottom: 8, color: "#FFD70099", fontWeight: 600}}>Amount</th>
-                <th style={{textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600}}>Details</th>
+                <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Date</th>
+                <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Type</th>
+                <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Asset</th>
+                <th style={{ textAlign: "right", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Amount</th>
+                <th style={{ textAlign: "left", paddingBottom: 8, color: "#FFD70099", fontWeight: 600 }}>Details</th>
               </tr>
             </thead>
             <tbody>
@@ -433,11 +425,11 @@ function InvestorDashboard() {
                 <tr key={i} style={{
                   background: i % 2 === 0 ? "rgba(32,32,64,0.13)" : "transparent"
                 }}>
-                  <td style={{padding:"6px 0", color:"#bab9e3"}}>{tx.date}</td>
-                  <td style={{padding:"6px 0", color:tx.color, fontWeight:700}}>{tx.type}</td>
-                  <td style={{padding:"6px 0"}}>{tx.asset}</td>
-                  <td style={{padding:"6px 0", color:"#FFD700", textAlign: "right"}}>{tx.type === "Purchase" ? <>-${tx.amount.toLocaleString(undefined, {minimumFractionDigits:2})}</> : <>+${tx.amount.toLocaleString(undefined, {minimumFractionDigits:2})}</>}</td>
-                  <td style={{padding:"6px 0", color:"#b0afff"}}>{tx.details}</td>
+                  <td style={{ padding: "6px 0", color: "#bab9e3" }}>{tx.date}</td>
+                  <td style={{ padding: "6px 0", color: tx.color, fontWeight: 700 }}>{tx.type}</td>
+                  <td style={{ padding: "6px 0" }}>{tx.asset}</td>
+                  <td style={{ padding: "6px 0", color: "#FFD700", textAlign: "right" }}>{tx.type === "Purchase" ? <>-${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</> : <>+${tx.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}</>}</td>
+                  <td style={{ padding: "6px 0", color: "#b0afff" }}>{tx.details}</td>
                 </tr>
               ))}
             </tbody>

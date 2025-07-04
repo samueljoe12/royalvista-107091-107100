@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import './App.css';
 import useGeolocation from './hooks/useGeolocation';
+import PageTransition from './components/PageTransition'; // For route animations
+import './utils/animationPresets'; // ensures side effect import makes presets available
 
 // Lazy imports for readability (can optimize with React.lazy later if needed)
 import LandingPage from './pages/LandingPage';
@@ -44,22 +46,54 @@ function App() {
           {theme === 'light' ? '🌙 Dark' : '☀️ Light'}
         </button>
         <Routes>
-          <Route path="/" element={
-            <LandingPage geoData={geo} />
-          } />
-          <Route path="/marketplace" element={
-            <Marketplace />
-          } />
-          <Route path="/ip/:id" element={
-            <IPDetail />
-          } />
-          <Route path="/creator" element={
-            <CreatorDashboard />
-          } />
-          <Route path="/investor" element={
-            <InvestorDashboard />
-          } />
-          <Route path="*" element={<NotFound />} />
+          <Route
+            path="/"
+            element={
+              <PageTransition>
+                <LandingPage geoData={geo} />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/marketplace"
+            element={
+              <PageTransition>
+                <Marketplace />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/ip/:id"
+            element={
+              <PageTransition>
+                <IPDetail />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/creator"
+            element={
+              <PageTransition>
+                <CreatorDashboard />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="/investor"
+            element={
+              <PageTransition>
+                <InvestorDashboard />
+              </PageTransition>
+            }
+          />
+          <Route
+            path="*"
+            element={
+              <PageTransition>
+                <NotFound />
+              </PageTransition>
+            }
+          />
         </Routes>
       </div>
     </Router>

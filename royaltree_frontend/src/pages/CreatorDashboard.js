@@ -4,6 +4,7 @@ import AssetCard from "../components/AssetCard";
 import AnimatedCounter from "../components/AnimatedCounter";
 import GradientButton from "../components/GradientButton";
 import { motion } from "framer-motion";
+import { fadeInUp } from "../utils/animationPresets";
 
 // PUBLIC_INTERFACE
 /**
@@ -116,14 +117,7 @@ function CreatorDashboard() {
     },
   ];
 
-  // Animation variants
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 35 },
-    visible: (d=0) => ({
-      opacity: 1, y: 0,
-      transition: { delay: d, duration: 0.7 }
-    }),
-  };
+  // Animation variants are now imported from animationPresets.js
 
   return (
     <>
