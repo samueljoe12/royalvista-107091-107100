@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
-import ChartMock from "../components/ChartMock";
+import ChartMock, { defaultBreakdown } from "../components/ChartMock";
 import GradientButton from "../components/GradientButton";
 import Modal from "../components/Modal";
 import AnimatedCounter from "../components/AnimatedCounter";
 import { motion } from "framer-motion";
 import { fadeInUp } from "../utils/animationPresets";
+import mockAssets from "../data/mockAssets";
 
 // PUBLIC_INTERFACE
 /**
@@ -19,40 +20,14 @@ import { fadeInUp } from "../utils/animationPresets";
  * - Fully responsive, scroll-animated, premium feel.
  */
 function IPDetail() {
-  // Mock asset data (should match cards from Marketplace)
-  const asset = {
-    image:
-      "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=600&q=80",
-    title: "Gold Soundtrack",
-    subtitle: "Music / Song",
-    owner: "Alice King",
-    badges: [
-      <span key="badge1" className="asset-subtitle" style={{
-        background: 'rgba(0,255,194,0.12)', padding: '4px 10px', borderRadius: '9px',
-        fontWeight: 700, fontSize: 13
-      }}>37% Owned</span>,
-      <span key="badge2" style={{
-        background: 'rgba(255,215,0,0.13)', padding: '4px 9px', borderRadius: '9px',
-        fontWeight: 700, fontSize: 12, color: '#FFD700'
-      }}>Est. 4.2%/yr</span>,
-    ],
-    stats: {
-      totalRoyalty: 18650.17,
-      userOwnership: 0.37,
-      userEarnings: 6904.56,
-    }
-  };
+  // For demo: use first asset in mockAssets (simulate param as needed)
+  const asset = mockAssets[0];
 
-  // Modal state for Invest CTA.
+  // Modal state for Invest CTA
   const [showInvest, setShowInvest] = useState(false);
 
-  // Chart mock data
-  const breakdown = [
-    { label: "Artist", value: 52, color: "#FFD700" },
-    { label: "Label", value: 24, color: "#00FFC2" },
-    { label: "Management", value: 11, color: "#62C1FF" },
-    { label: "Royalty Fund", value: 13, color: "#FF5B94" }
-  ];
+  // Royalty breakdown (imported default for demonstration)
+  const breakdown = defaultBreakdown;
 
   // NavBar links (reuse main app ones)
   const navLinks = [
@@ -92,7 +67,22 @@ function IPDetail() {
                 title={asset.title}
                 subtitle={asset.subtitle}
                 owner={asset.owner}
-                badges={asset.badges}
+                badges={asset.badges.map(b => (
+                  <span
+                    key={b.key + "-detail"}
+                    className="asset-subtitle"
+                    style={{
+                      background: b.style.background,
+                      padding: "4px 10px",
+                      borderRadius: "9px",
+                      fontWeight: 700,
+                      fontSize: 13,
+                      color: b.style.color
+                    }}
+                  >
+                    {b.text}
+                  </span>
+                ))}
                 footer={
                   <div style={{ marginTop: 8 }}>
                     <div style={{

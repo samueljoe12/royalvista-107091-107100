@@ -4,76 +4,33 @@ import NavBar from "../components/NavBar";
 import TabSwitcher from "../components/TabSwitcher";
 import GradientButton from "../components/GradientButton";
 import useGeolocation from "../hooks/useGeolocation";
+import mockAssets from "../data/mockAssets";
 
 /**
  * Marketplace - Responsive grid of assets with dummy data, filtering & sorting mock controls.
  * Enhances UX: Region/country filtering is enabled when geolocation is available.
  */
 function Marketplace() {
-  // Dummy asset data (shared with the LandingPage style)
-  // In a real app, each asset would have region/country, here we'll mock some.
-  const assets = [
-    {
-      image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=600&q=80",
-      title: "Gold Soundtrack",
-      subtitle: "Music / Song",
-      owner: "Alice King",
-      region: "California",
-      country: "US",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.12)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>37% Owned</span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.13)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 4.2%/yr</span>
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&w=600&q=80",
-      title: "Arcane Art Piece",
-      subtitle: "Visual Art",
-      owner: "Carlos Wu",
-      region: "Berlin",
-      country: "DE",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.13)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>20% Owned</span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.11)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 2.1%/yr</span>
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&w=600&q=80",
-      title: "Futurist Novel",
-      subtitle: "Literature",
-      owner: "Morgan Lee",
-      region: "Seoul",
-      country: "KR",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.11)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>12% Owned</span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.14)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 6.7%/yr</span>
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&w=600&q=80",
-      title: "Pop Single Rights",
-      subtitle: "Music / Rights",
-      owner: "Devon Green",
-      region: "California",
-      country: "US",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.13)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>49% Owned</span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.11)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 3.1%/yr</span>
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&w=600&q=80",
-      title: "Street Photography Collection",
-      subtitle: "Photography",
-      owner: "Eva Silver",
-      region: "Berlin",
-      country: "DE",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.11)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>35% Owned</span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.12)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 2.9%/yr</span>
-      ]
-    }
-  ];
+  // Load from mockAssets for all asset rendering
+  const assets = mockAssets.map(asset => ({
+    ...asset,
+    badges: asset.badges.map(b => (
+      <span
+        key={b.key + "-" + asset.id}
+        className="asset-subtitle"
+        style={{
+          background: b.style.background,
+          padding: "4px 10px",
+          borderRadius: "9px",
+          fontWeight: 700,
+          fontSize: 12,
+          color: b.style.color
+        }}
+      >
+        {b.text}
+      </span>
+    ))
+  }));
 
   // Dummy filter state
   const [tab, setTab] = useState("all");

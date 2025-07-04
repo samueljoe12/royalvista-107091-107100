@@ -4,6 +4,8 @@ import AssetCard from "../components/AssetCard";
 import AnimatedCounter from "../components/AnimatedCounter";
 import { motion } from "framer-motion";
 import { fadeInUp } from "../utils/animationPresets";
+import mockAssets from "../data/mockAssets";
+import mockTransactions from "../data/mockTransactions";
 
 // PUBLIC_INTERFACE
 /**
@@ -11,187 +13,51 @@ import { fadeInUp } from "../utils/animationPresets";
  * and a mocked transaction history. Uses AssetCard, AnimatedCounter, and glassmorphic styling.
  */
 function InvestorDashboard() {
-  // Mock owned asset data (static example)
-  const ownedAssets = [
-    {
-      image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=600&q=80",
-      title: "Gold Soundtrack",
-      subtitle: "Music / Song",
-      owner: "Alice King",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{
-          background: 'rgba(0,255,194,0.13)',
-          padding: '4px 10px',
-          borderRadius: '9px',
+  // Use mockAssets for owned assets, and mockTransactions for activity
+  const ownedAssets = mockAssets.slice(0, 3).map(asset => ({
+    ...asset,
+    badges: asset.badges.map(b => (
+      <span
+        key={b.key + "-" + asset.id}
+        className="asset-subtitle"
+        style={{
+          background: b.style.background,
+          padding: "4px 10px",
+          borderRadius: "9px",
           fontWeight: 700,
-          fontSize: 13
+          fontSize: 13,
+          color: b.style.color
+        }}
+      >
+        {b.text}
+      </span>
+    )),
+    footer: (
+      <div>
+        <div style={{
+          color: "#FFD700",
+          fontWeight: 600,
+          fontSize: 15.5,
+          letterSpacing: 0.01
         }}>
-          37% Owned
-        </span>,
-        <span key="badge2" style={{
-          background: 'rgba(255,215,0,0.10)',
-          padding: '4px 9px',
-          borderRadius: '9px',
-          fontWeight: 700,
-          fontSize: 12,
-          color: '#FFD700'
-        }}>
-          Est. 4.2%/yr
-        </span>,
-      ],
-      footer: (
-        <div>
-          <div style={{
-            color: "#FFD700",
-            fontWeight: 600,
-            fontSize: 15.5,
-            letterSpacing: 0.01
-          }}>
-            Projected Returns
-          </div>
-          <AnimatedCounter
-            value={2984.21}
-            prefix="$"
-            decimals={2}
-            color="#FFD700"
-            style={{ fontSize: 21, marginTop: 2 }}
-          />
+          Projected Returns
         </div>
-      )
-    },
-    {
-      image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&w=600&q=80",
-      title: "Arcane Art Piece",
-      subtitle: "Visual Art",
-      owner: "Carlos Wu",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{
-          background: 'rgba(0,255,194,0.09)',
-          padding: '4px 10px',
-          borderRadius: '9px',
-          fontWeight: 700,
-          fontSize: 13
-        }}>
-          20% Owned
-        </span>,
-        <span key="badge2" style={{
-          background: 'rgba(255,215,0,0.11)',
-          padding: '4px 9px',
-          borderRadius: '9px',
-          fontWeight: 700,
-          fontSize: 12,
-          color: '#FFD700'
-        }}>
-          Est. 2.1%/yr
-        </span>,
-      ],
-      footer: (
-        <div>
-          <div style={{
-            color: "#FFD700",
-            fontWeight: 600,
-            fontSize: 15.5,
-            letterSpacing: 0.01
-          }}>
-            Projected Returns
-          </div>
-          <AnimatedCounter
-            value={784.12}
-            prefix="$"
-            decimals={2}
-            color="#FFD700"
-            style={{ fontSize: 21, marginTop: 2 }}
-          />
-        </div>
-      )
-    },
-    {
-      image: "https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&w=600&q=80",
-      title: "Futurist Novel",
-      subtitle: "Literature",
-      owner: "Morgan Lee",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{
-          background: 'rgba(0,255,194,0.17)',
-          padding: '4px 10px',
-          borderRadius: '9px',
-          fontWeight: 700,
-          fontSize: 13
-        }}>
-          12% Owned
-        </span>,
-        <span key="badge2" style={{
-          background: 'rgba(255,215,0,0.09)',
-          padding: '4px 9px',
-          borderRadius: '9px',
-          fontWeight: 700,
-          fontSize: 12,
-          color: '#FFD700'
-        }}>
-          Est. 6.7%/yr
-        </span>,
-      ],
-      footer: (
-        <div>
-          <div style={{
-            color: "#FFD700",
-            fontWeight: 600,
-            fontSize: 15.5,
-            letterSpacing: 0.01
-          }}>
-            Projected Returns
-          </div>
-          <AnimatedCounter
-            value={332.86}
-            prefix="$"
-            decimals={2}
-            color="#FFD700"
-            style={{ fontSize: 21, marginTop: 2 }}
-          />
-        </div>
-      )
-    },
-  ];
+        <AnimatedCounter
+          value={asset.stats.userEarnings * 0.43}
+          prefix="$"
+          decimals={2}
+          color="#FFD700"
+          style={{ fontSize: 21, marginTop: 2 }}
+        />
+      </div>
+    )
+  }));
 
-  // Mock transaction history (simple static)
-  const transactions = [
-    {
-      date: "2024-05-04",
-      type: "Purchase",
-      asset: "Gold Soundtrack",
-      amount: 2100,
-      details: "37% ownership",
-      color: "#FFD700"
-    },
-    {
-      date: "2024-04-18",
-      type: "Royalty",
-      asset: "Gold Soundtrack",
-      amount: 122.40,
-      details: "Q1 Royalty Payout",
-      color: "#00FFC2"
-    },
-    {
-      date: "2024-04-10",
-      type: "Purchase",
-      asset: "Futurist Novel",
-      amount: 140,
-      details: "12% ownership",
-      color: "#FFD700"
-    },
-    {
-      date: "2024-03-29",
-      type: "Royalty",
-      asset: "Arcane Art Piece",
-      amount: 31.18,
-      details: "Quarterly Payout",
-      color: "#00FFC2"
-    }
-  ];
+  const transactions = mockTransactions;
 
-  // Overall animated stats
-  const totalInvested = 2100 + 140;
-  const estAnnualReturn = 1127.5;
+  // Overall animated stats (computed examples)
+  const totalInvested = transactions.filter(tx => tx.type === "Purchase").reduce((sum, tx) => sum + tx.amount, 0);
+  const estAnnualReturn = ownedAssets.reduce((sum, a) => sum + (a.estRoyalty || 0) * 200, 0); // Fake formula
   const assetsCount = ownedAssets.length;
 
   // NavBar links reused for consistency

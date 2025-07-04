@@ -5,82 +5,40 @@ import AnimatedCounter from "../components/AnimatedCounter";
 import GradientButton from "../components/GradientButton";
 import { motion } from "framer-motion";
 import { fadeInUp } from "../utils/animationPresets";
+import mockAssets from "../data/mockAssets";
 
 // PUBLIC_INTERFACE
 /**
  * CreatorDashboard - Displays the creator's uploaded IP assets and animated statistics.
  * Sections:
  * - Animated summary stats (earnings, % sold, num assets)
- * - Grid of asset cards (mock data)
+ * - Grid of asset cards built from dummy/mock data module
  * - Uses glassmorphism, reusable AssetCard, AnimatedCounter, GradientButton
  */
-function CreatorDashboard() {
-  // Mock stats and asset data (dummy, static for now)
-  const stats = {
-    totalEarnings: 29857.31,
-    soldPercent: 71.3,
-    numAssets: 4,
-  };
 
-  // Dummy uploaded assets (could be shared with other pages for realism)
-  const assets = [
-    {
-      image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=600&q=80",
-      title: "Gold Soundtrack",
-      subtitle: "Music / Song",
-      owner: "You",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.16)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:13}}>
-          87% Sold
-        </span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.13)',padding:'4px 9px',borderRadius:'9px',fontWeight:700,fontSize:12,color:'#FFD700'}}>
-          $13,642.90 Earned
-        </span>,
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&w=600&q=80",
-      title: "Arcane Art Piece",
-      subtitle: "Visual Art",
-      owner: "You",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.13)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:13}}>
-          65% Sold
-        </span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.12)',padding:'4px 9px',borderRadius:'9px',fontWeight:700,fontSize:12,color:'#FFD700'}}>
-          $5,981.12 Earned
-        </span>,
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&w=600&q=80",
-      title: "Futurist Novel",
-      subtitle: "Literature",
-      owner: "You",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.11)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:13}}>
-          73% Sold
-        </span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.11)',padding:'4px 9px',borderRadius:'9px',fontWeight:700,fontSize:12,color:'#FFD700'}}>
-          $7,180.22 Earned
-        </span>,
-      ]
-    },
-    {
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&w=600&q=80",
-      title: "Pop Single Rights",
-      subtitle: "Music / Rights",
-      owner: "You",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.14)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:13}}>
-          60% Sold
-        </span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.10)',padding:'4px 9px',borderRadius:'9px',fontWeight:700,fontSize:12,color:'#FFD700'}}>
-          $3,053.07 Earned
-        </span>,
-      ]
-    },
-  ];
+function CreatorDashboard() {
+  // Only show assets owned by 'You' (for mockup, let's simulate all as yours for now)
+  // In a real app, filter: asset => asset.owner === current user.
+  const assets = mockAssets.map(asset => ({
+    ...asset,
+    owner: "You", // for creator context
+    badges: [
+      <span key={"sold-" + asset.id} className="asset-subtitle" style={{ background: asset.badges[0].style.background, padding: "4px 10px", borderRadius: "9px", fontWeight: 700, fontSize: 13 }}>
+        {Math.round(asset.ownership * 100)}% Sold
+      </span>,
+      <span key={"earned-" + asset.id} style={{ background: "rgba(255,215,0,0.13)", padding: "4px 9px", borderRadius: "9px", fontWeight: 700, fontSize: 12, color: "#FFD700" }}>
+        ${asset.stats.userEarnings.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+        {" "}Earned
+      </span>
+    ]
+  }));
+
+  // Mock stats, derived from assets above
+  const totalEarnings = assets.reduce((sum, asset) => sum + (asset.stats.userEarnings || 0), 0);
+  const soldPercent = assets.length
+    ? assets.reduce((sum, a) => sum + a.ownership, 0) / assets.length * 100
+    : 0;
+  const numAssets = assets.length;
 
   // NavBar links (consistency across app)
   const navLinks = [
@@ -94,7 +52,7 @@ function CreatorDashboard() {
   const statCards = [
     {
       label: "Total Earnings",
-      value: stats.totalEarnings,
+      value: totalEarnings,
       prefix: "$",
       color: "#FFD700",
       decimals: 2,
@@ -102,7 +60,7 @@ function CreatorDashboard() {
     },
     {
       label: "% Sold Across Assets",
-      value: stats.soldPercent,
+      value: soldPercent,
       suffix: "%",
       color: "#00FFC2",
       decimals: 1,
@@ -110,7 +68,7 @@ function CreatorDashboard() {
     },
     {
       label: "Assets Uploaded",
-      value: stats.numAssets,
+      value: numAssets,
       color: "#b0afff",
       decimals: 0,
       icon: "🖼️"

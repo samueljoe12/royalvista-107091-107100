@@ -2,13 +2,18 @@ import React from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
 
-// Dummy slices/colors for a royalty breakdown chart
-const defaultSlices = [
+/**
+ * Shared default royalty breakdown chart data for dummy use
+ */
+export const defaultBreakdown = [
   { label: "Artist", value: 52, color: "#FFD700" },
   { label: "Label", value: 24, color: "#00FFC2" },
   { label: "Management", value: 11, color: "#62C1FF" },
-  { label: "Royalty Fund", value: 13, color: "#FF5B94" },
+  { label: "Royalty Fund", value: 13, color: "#FF5B94" }
 ];
+
+// Dummy slices/colors for a royalty breakdown chart for backward compatibility
+const defaultSlices = defaultBreakdown;
 
 // PUBLIC_INTERFACE
 /**
