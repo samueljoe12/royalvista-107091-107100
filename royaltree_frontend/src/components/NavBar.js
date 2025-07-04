@@ -15,18 +15,11 @@ function NavBar({ links = [], logoSrc, brandName, rightSection }) {
     <nav
       className="navbar-glass"
       style={{
-        background: "rgba(24, 26, 40, 0.7)",
-        backdropFilter: "blur(10px)",
-        borderBottom: "1px solid rgba(255,255,255,0.08)",
-        boxShadow: "0 6px 20px 0 rgba(0,0,0,0.12)",
-        position: "sticky",
-        top: 0,
-        zIndex: 30,
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
         height: 66,
-        padding: "0 2rem",
+        padding: "0 2rem"
       }}
     >
       <motion.div
@@ -41,6 +34,7 @@ function NavBar({ links = [], logoSrc, brandName, rightSection }) {
           fontSize: 22,
           background: "linear-gradient(90deg,#FFD700,#00FFC2)",
           WebkitBackgroundClip: "text",
+          backgroundClip: "text",
           color: "transparent"
         }}>{brandName}</span>
       </motion.div>

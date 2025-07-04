@@ -18,23 +18,16 @@ function AssetCard({ image, title, subtitle, owner, badges = [], footer, onClick
     <motion.div
       className="asset-card-glass"
       onClick={onClick}
-      whileHover={{
-        scale: 1.045,
-        boxShadow: "0 4px 36px #FFD70044, 0 1.5px 14px #00FFC277"
-      }}
+      whileHover={onClick ? {
+        scale: 1.064,
+        boxShadow: "0 4px 36px #FFD70044, 0 1.5px 14px #00FFC277",
+        filter: "drop-shadow(0 0 19px #FFD70080)"
+      } : {}}
       style={{
-        background: "linear-gradient(140deg,rgba(44,53,64,0.78) 70%,rgba(0,255,194,0.15))",
-        backdropFilter: "blur(7px)",
-        borderRadius: 22,
-        border: "1px solid rgba(255,255,255,0.10)",
-        boxShadow: "0 1px 10px rgba(32,35,64,0.18)",
-        transition: "all 0.17s",
-        cursor: onClick ? "pointer" : "default",
-        overflow: "hidden",
-        padding: 0,
         minWidth: 240,
         maxWidth: 340,
-        margin: "auto"
+        margin: "auto",
+        cursor: onClick ? "pointer" : "default"
       }}
     >
       {image &&
