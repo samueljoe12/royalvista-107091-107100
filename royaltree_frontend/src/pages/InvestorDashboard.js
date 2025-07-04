@@ -243,7 +243,11 @@ function InvestorDashboard() {
                 padding: "2em 0"
               }}>No owned assets yet.</div>
             ) : ownedAssets.map((asset, i) => (
-              <AssetCard key={asset.title + "-" + i} {...asset} />
+              <AssetCard
+                key={asset.title + "-" + i}
+                {...asset}
+                onClick={() => window.location.assign(`/ip/${mockAssets[i]?.id || "detail"}`)}
+              />
             ))}
           </div>
         </motion.div>

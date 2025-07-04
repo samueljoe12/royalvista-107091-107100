@@ -19,7 +19,12 @@ import { useNavigate } from "react-router-dom";
  */
 function LandingPage() {
   const navigate = useNavigate();
-  // Dummy asset card data for animated grid
+
+  // Modal/playback state for mock audio feedback
+  const [audioPlaying, setAudioPlaying] = React.useState(false);
+  const [lastPlayed, setLastPlayed] = React.useState(null);
+
+  // Dummy asset card data for animated grid (add onClick and mock audio)
   const assetMocks = [
     {
       image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=600&q=80",
@@ -29,7 +34,10 @@ function LandingPage() {
       badges: [
         <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.12)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>37% Owned</span>,
         <span key="badge2" style={{background:'rgba(255,215,0,0.13)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 4.2%/yr</span>
-      ]
+      ],
+      onClick: () => navigate("/ip/asset-001"),
+      audioDemo: true,
+      onAudioDemoClick: () => { setAudioPlaying(true); setLastPlayed("Gold Soundtrack"); setTimeout(() => setAudioPlaying(false), 1000); }
     },
     {
       image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&w=600&q=80",
@@ -39,7 +47,9 @@ function LandingPage() {
       badges: [
         <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.13)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>20% Owned</span>,
         <span key="badge2" style={{background:'rgba(255,215,0,0.11)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 2.1%/yr</span>
-      ]
+      ],
+      onClick: () => navigate("/ip/asset-002"),
+      audioDemo: false
     },
     {
       image: "https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&w=600&q=80",
@@ -49,7 +59,9 @@ function LandingPage() {
       badges: [
         <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.11)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>12% Owned</span>,
         <span key="badge2" style={{background:'rgba(255,215,0,0.14)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 6.7%/yr</span>
-      ]
+      ],
+      onClick: () => navigate("/ip/asset-003"),
+      audioDemo: false
     },
     {
       image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&w=600&q=80",
@@ -59,7 +71,10 @@ function LandingPage() {
       badges: [
         <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.13)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>49% Owned</span>,
         <span key="badge2" style={{background:'rgba(255,215,0,0.11)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 3.1%/yr</span>
-      ]
+      ],
+      onClick: () => navigate("/ip/asset-004"),
+      audioDemo: true,
+      onAudioDemoClick: () => { setAudioPlaying(true); setLastPlayed("Pop Single Rights"); setTimeout(() => setAudioPlaying(false), 1000); }
     }
   ];
 
@@ -186,10 +201,35 @@ function LandingPage() {
               custom={0.22 + i*0.13}
               style={{display:"flex"}}
             >
+              {/* Pass audioDemo and onAudioDemoClick for music asset demo */}
               <AssetCard {...asset} />
             </motion.div>
           ))}
         </motion.div>
+        {/* Mock audio playback notification */}
+        {audioPlaying && (
+          <div
+            style={{
+              position: "fixed",
+              bottom: 33,
+              left: "50%",
+              transform: "translateX(-50%)",
+              background: "linear-gradient(90deg, #FFD700ea, #00FFC2c7)",
+              color: "#191937",
+              borderRadius: 12,
+              boxShadow: "0 4px 32px #FFD70033",
+              fontWeight: 700,
+              fontSize: 17,
+              padding: "13px 27px",
+              zIndex: 3001,
+              opacity: 1,
+              animation: "fadein-up .5s both"
+            }}
+            aria-live="polite"
+          >
+            Mock audio: Playing "{lastPlayed}"...
+          </div>
+        )}
       </section>
     </>
   );

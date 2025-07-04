@@ -14,7 +14,9 @@ import { cardHover } from "../utils/animationPresets";
  * @param {React.Component} footer Custom footer (shows available % and est. royalty; optional)
  * @param {Function} onClick
  */
-function AssetCard({ image, title, subtitle, owner, badges = [], footer, onClick }) {
+function AssetCard({ image, title, subtitle, owner, badges = [], footer, onClick, audioDemo, onAudioDemoClick }) {
+  // Let this component optionally render a mock audio "play" below the card if audioDemo is true
+  // and expose a play button when onAudioDemoClick is provided.
   return (
     <motion.div
       className="asset-card-glass"
@@ -26,6 +28,10 @@ function AssetCard({ image, title, subtitle, owner, badges = [], footer, onClick
         margin: "auto",
         cursor: onClick ? "pointer" : "default"
       }}
+      tabIndex={onClick ? 0 : -1}
+      role={onClick ? "button" : undefined}
+      aria-pressed="false"
+      onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { onClick(); } } : undefined}
     >
       {image &&
         <div style={{ height: 185, background: "#1A1A24", overflow: "hidden" }}>
@@ -61,6 +67,34 @@ function AssetCard({ image, title, subtitle, owner, badges = [], footer, onClick
           opacity: 0.76
         }}>by {owner}</div>
         {footer && <div style={{ marginTop: 12 }}>{footer}</div>}
+        {/* Optional mock audio playback for demo (e.g. music assets in Marketplace) */}
+        {audioDemo && (
+          <div style={{ marginTop: 18, textAlign: "center" }}>
+            <button
+              type="button"
+              style={{
+                background: "linear-gradient(90deg,#FFD700 70%,#00FFC2 100%)",
+                color: "#181828",
+                borderRadius: "50%",
+                border: "none",
+                width: 40,
+                height: 40,
+                fontSize: 20,
+                fontWeight: 700,
+                marginBottom: 3,
+                boxShadow: "0 0 13px #FFD70044, 0 1px 8px #00FFC228",
+                cursor: "pointer"
+              }}
+              onClick={e => { e.stopPropagation(); onAudioDemoClick && onAudioDemoClick(); }}
+              aria-label="Play mock audio"
+            >▶</button>
+            <div style={{
+              color: "#FFD700", fontWeight: 600, fontSize: 13.7
+            }}>
+              Demo Playback (Mock)
+            </div>
+          </div>
+        )}
       </div>
     </motion.div>
   );
