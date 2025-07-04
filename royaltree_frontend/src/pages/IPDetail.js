@@ -13,23 +13,34 @@ import mockAssets from "../data/mockAssets";
 /**
  * IPDetail - Detailed view for a single digital asset/IP.
  * Features:
- * - Asset preview with image, title, subtitle, badges and ownership info.
- * - Mocked Royalty Breakdown Chart (ChartMock).
- * - Animated Invest button that pops up animated Modal.
- * - Usage of Royaltree's glassmorphic/gradient style and reusable components.
- * - Fully responsive, scroll-animated, premium feel.
+ *  1. Asset preview (image/audio mock/with type check).
+ *  2. Royalty Breakdown Chart using ChartMock and styled placeholder data.
+ *  3. Animated Invest button that triggers a glassmorphic investment modal.
+ * The design is modern, glassmorphic, uses Royaltree's colors and animations, fully responsive.
+ *
+ * Data: Uses mockAssets and ChartMock's placeholder breakdown.
  */
 function IPDetail() {
-  // For demo: use first asset in mockAssets (simulate param as needed)
-  const asset = mockAssets[0];
-
-  // Modal state for Invest CTA
+  // Demo: Use first asset and branch logic by subtitle (music with "audio", else image).
+  const asset = mockAssets[0] || {
+    title: "Untitled Asset",
+    subtitle: "",
+    image: "",
+    badges: [],
+    owner: "Unknown",
+    stats: { totalRoyalty: 0, userOwnership: 0, userEarnings: 0 }
+  };
   const [showInvest, setShowInvest] = useState(false);
 
-  // Royalty breakdown (imported default for demonstration)
+  // Use subtitle/type to mock image vs. audio preview.
+  // If asset.subtitle includes "Music", show an audio mock, else show image.
+  // For demo, if mockAssets[0], it's Music / Song, so show audio mock below image.
+  const isAudio = typeof asset.subtitle === "string" && asset.subtitle.toLowerCase().includes("music");
+
+  // Royalty breakdown, always ChartMock with demo data.
   const breakdown = defaultBreakdown;
 
-  // NavBar links (reuse main app ones)
+  // NavBar links, consistent with the app.
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "Marketplace", href: "/marketplace" },
@@ -60,14 +71,14 @@ function IPDetail() {
               position: "relative"
             }}
           >
-            {/* Asset Preview (left) */}
+            {/* ASSET PREVIEW (LEFT) */}
             <div style={{ maxWidth: 410, margin: "auto" }}>
               <AssetCard
                 image={asset.image}
                 title={asset.title}
                 subtitle={asset.subtitle}
                 owner={asset.owner}
-                badges={asset.badges.map(b => (
+                badges={asset.badges?.map(b => (
                   <span
                     key={b.key + "-detail"}
                     className="asset-subtitle"
@@ -94,7 +105,7 @@ function IPDetail() {
                       Total Earned Royalties
                     </div>
                     <AnimatedCounter
-                      value={asset.stats.totalRoyalty}
+                      value={asset.stats?.totalRoyalty || 0}
                       prefix="$"
                       decimals={2}
                       style={{ fontSize: 28 }}
@@ -103,9 +114,97 @@ function IPDetail() {
                 }
                 onClick={null}
               />
+              {/* Audio or Visual Mockup Under Card (if audio asset) */}
+              {isAudio && (
+                <motion.div
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.15 }}
+                  style={{
+                    margin: "21px auto 0 auto",
+                    width: "95%",
+                    borderRadius: 12,
+                    background: "linear-gradient(125deg,#19192aee 77%,#FFD70015)",
+                    boxShadow: "0 2px 22px #FFD70014,0 1px 7px #00FFC228",
+                    padding: "17px 11px 13px 11px",
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center"
+                  }}
+                >
+                  {/* Audio mock: visual track and play button */}
+                  <div style={{
+                    display: "flex", alignItems: "center", gap: 14,
+                    marginBottom: 7
+                  }}>
+                    <span
+                      style={{
+                        display: "inline-block",
+                        width: 44,
+                        height: 44,
+                        borderRadius: "50%",
+                        background: "linear-gradient(90deg,#FFD700 35%,#00FFC2 80%)",
+                        boxShadow: "0 0 18px #FFD70060,0 1px 5px #00FFC220",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        fontSize: 28,
+                        color: "#181828",
+                        cursor: "not-allowed",
+                        userSelect: "none"
+                      }}
+                    >
+                      <span style={{ marginLeft: 5 }}>▶</span>
+                    </span>
+                    {/* Track visual */}
+                    <div style={{
+                      width: 170,
+                      height: 20,
+                      borderRadius: 17,
+                      background: "linear-gradient(90deg,#FFD70011 10%,#00FFC223 98%)",
+                      position: "relative",
+                      overflow: "hidden",
+                    }}>
+                      {[...Array(12)].map((_, i) => (
+                        <span
+                          key={i}
+                          style={{
+                            display: "inline-block",
+                            width: 8,
+                            height: `${18 - Math.abs(i - 5) * 3}px`,
+                            background: "#FFD70099",
+                            borderRadius: 5,
+                            margin: "0 2px",
+                            opacity: 0.7 - Math.abs(i - 5) * 0.07
+                          }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{
+                    color: "#FFD700",
+                    fontWeight: 700,
+                    fontSize: 13,
+                    letterSpacing: 0.01,
+                    marginBottom: 2
+                  }}>
+                    Music Preview (Demo Only)
+                  </div>
+                  <div style={{
+                    color: "#bab9e3",
+                    fontSize: 13,
+                    marginBottom: -3,
+                    marginTop: -4,
+                    opacity: 0.74
+                  }}>
+                    Full playback coming soon!
+                  </div>
+                </motion.div>
+              )}
             </div>
-            {/* Asset Details and Action (right) */}
+            {/* RIGHT: Royalty Chart, Ownership, Invest */}
             <div style={{ display: "flex", flexDirection: "column", gap: 29 }}>
+              {/* Royalty Breakdown Section */}
               <motion.div
                 variants={fadeInUp}
                 initial="hidden"
@@ -135,6 +234,7 @@ function IPDetail() {
                 </div>
                 <ChartMock slices={breakdown} size={153} title={null} />
               </motion.div>
+              {/* Ownership and Earnings */}
               <motion.div
                 variants={fadeInUp}
                 initial="hidden"
@@ -163,7 +263,7 @@ function IPDetail() {
                   marginBottom: 8
                 }}>
                   <AnimatedCounter
-                    value={asset.stats.userOwnership * 100}
+                    value={(asset.stats?.userOwnership || 0) * 100}
                     suffix="%"
                     decimals={2}
                     color="#00FFC2"
@@ -185,7 +285,9 @@ function IPDetail() {
                   color: "#ebffee", fontWeight: 500,
                   fontSize: 14, margin: "8px 0"
                 }}>
-                  My total earnings: <span style={{ color: "#FFD700", fontWeight: 700 }}>${asset.stats.userEarnings.toLocaleString(undefined, { minimumFractionDigits: 2 })}</span>
+                  My total earnings: <span style={{ color: "#FFD700", fontWeight: 700 }}>
+                    ${asset.stats?.userEarnings?.toLocaleString(undefined, { minimumFractionDigits: 2 }) ?? "0.00"}
+                  </span>
                 </div>
               </motion.div>
               {/* Animated Invest Button */}
@@ -221,7 +323,7 @@ function IPDetail() {
           </div>
         </motion.div>
       </section>
-      {/* Invest modal (animated, glass, reuses Modal component) */}
+      {/* Invest Modal - glassmorphic, animated, mocks investment */}
       <Modal open={showInvest} onClose={() => setShowInvest(false)} maxWidth="390px">
         <motion.div
           initial={{ opacity: 0, y: 26 }}
@@ -243,9 +345,9 @@ function IPDetail() {
             marginBottom: 14,
             textAlign: "center"
           }}>
-            (Investment simulation only. No blockchain or payments. Enter an amount below.)
+            (Investment simulation only&mdash;no blockchain or payments. Enter an amount below.)
           </div>
-          {/* Simple input form - not functional, mock only */}
+          {/* Simple input form - disabled for mock */}
           <input
             type="number"
             placeholder="Amount (USD)"
@@ -289,8 +391,7 @@ function IPDetail() {
           </div>
         </motion.div>
       </Modal>
-      {/* Responsive fallback: Single column on mobile */}
-      {/* Responsiveness now handled fully by App.css */}
+      {/* Responsive fallback: Single column on mobile/tablet handled via App.css */}
     </>
   );
 }
