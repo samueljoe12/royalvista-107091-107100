@@ -5,6 +5,7 @@ import TabSwitcher from "../components/TabSwitcher";
 import GradientButton from "../components/GradientButton";
 import useGeolocation from "../hooks/useGeolocation";
 import mockAssets from "../data/mockAssets";
+import { useNavigate } from "react-router-dom";
 
 /*
   --- FIX NOTES ---
@@ -37,6 +38,7 @@ import mockAssets from "../data/mockAssets";
  * This version ensures each AssetCard displays asset name, creator, available ownership %, and estimated royalty.
  */
 function Marketplace() {
+  const navigate = useNavigate();
   // Utility: Return badge styled span
   const badgeSpan = (badge, asset, customStyle = {}) => (
     <span
@@ -116,7 +118,7 @@ function Marketplace() {
           </span>
         </div>
       ),
-      onClick: () => window.location.href = `/ip/${asset.id}`
+      onClick: () => navigate(`/ip/${asset.id}`)
     };
   });
 

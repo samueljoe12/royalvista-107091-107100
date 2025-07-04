@@ -64,29 +64,44 @@ function NavBar({ links = [], logoSrc, brandName, rightSection, geoData }) {
         }}>{brandName}</span>
       </motion.div>
       <div className="navbar-links" style={{ display: "flex", alignItems: "center", gap: 28 }}>
+        {/* Use NavLink for each nav link for SPA routing */}
         {links.map(({ label, href }) => (
-          <motion.a
+          <NavLink
             key={href}
-            href={href}
-            whileHover={{
-              scale: 1.13,
-              color: "#FFD700",
-              textShadow: "0 0 8px #FFD700AA"
-            }}
-            style={{
-              color: "#fff",
+            to={href}
+            className={({ isActive }) => 
+              isActive 
+                ? "active"
+                : undefined
+            }
+            style={({ isActive }) => ({
+              color: isActive ? "#FFD700" : "#fff",
               textDecoration: "none",
               fontWeight: 500,
-              fontSize: 17,
+              fontSize: "17px",
               letterSpacing: "0.02em",
-              padding: "6px 10px",
+              padding: "6px 13px",
               borderRadius: 7,
-              transition: "background 0.2s",
-              position: "relative"
-            }}
+              background: isActive
+                ? "linear-gradient(90deg,#FFD70022,#00FFC210)"
+                : "linear-gradient(90deg,#FFD70012 18%,#00FFC210 81%)",
+              border: isActive
+                ? "1.6px solid #FFD700AA"
+                : "1.3px solid #FFD70044",
+              boxShadow: isActive
+                ? "0 0 13px #FFD70055"
+                : undefined,
+              transition: "all 0.18s",
+              marginLeft: 2,
+              userSelect: "none",
+              display: "inline-block",
+              textShadow: isActive
+                ? "0 0 8px #FFD700AA"
+                : "0 0 5px #FFD70022"
+            })}
           >
             {label}
-          </motion.a>
+          </NavLink>
         ))}
         {/* IP Detail working nav link */}
         <NavLink

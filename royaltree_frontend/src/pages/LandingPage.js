@@ -8,6 +8,7 @@ import {
   fadeIn,
   growIn
 } from "../utils/animationPresets";
+import { useNavigate } from "react-router-dom";
 
 /** Accepts geoData? For NavBar geolocation greeting use. */
 
@@ -17,6 +18,7 @@ import {
  * Features animated gradient heading, intro text, CTA buttons, and mock animated AssetCards.
  */
 function LandingPage() {
+  const navigate = useNavigate();
   // Dummy asset card data for animated grid
   const assetMocks = [
     {
@@ -148,7 +150,7 @@ function LandingPage() {
           >
             <motion.div variants={growIn} custom={0.26} initial="hidden" animate="visible">
               <GradientButton
-                onClick={() => window.location.href = "/marketplace"}
+                onClick={() => navigate("/marketplace")}
                 wide
               >
                 Explore Marketplace
@@ -156,7 +158,7 @@ function LandingPage() {
             </motion.div>
             <motion.div variants={growIn} custom={0.32} initial="hidden" animate="visible">
               <GradientButton
-                onClick={() => window.location.href = "/creator"}
+                onClick={() => navigate("/creator")}
                 wide
                 icon={<span style={{fontSize:19}}>★</span>}
               >
