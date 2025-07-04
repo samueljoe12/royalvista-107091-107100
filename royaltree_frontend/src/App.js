@@ -70,6 +70,15 @@ function App() {
               </PageTransition>
             }
           />
+          {/* Add dedicated route for /ip-detail to support NavBar */}
+          <Route
+            path="/ip-detail"
+            element={
+              <PageTransition>
+                <IPDetail />
+              </PageTransition>
+            }
+          />
           <Route
             path="/creator"
             element={
