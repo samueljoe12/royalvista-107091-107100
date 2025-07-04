@@ -1,23 +1,31 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Modal from "./Modal";
 import GradientButton from "./GradientButton";
 
 /**
  * PUBLIC_INTERFACE
- * UploadAssetModal - Responsive upload modal with scroll/flexible height, glassmorphic style,
- * asset-type-specific upload fields (image or music), animated feedback, and previews.
+ * UploadAssetModal - Responsive modal for uploading IP assets (art, music, design, video).
+ * Prompts for asset name, creator name, ownership %, estimated royalty, asset type,
+ * and provides a context-sensitive file input matching the selected type (with preview).
+ * Keeps glassmorphic, animated, and clear layout. Includes live field validation.
+ * 
  * @param {boolean} isOpen - Whether modal is shown
  * @param {function} onRequestClose - Callback for closing modal
- * @param {function} onUpload - Callback for completed upload (mocked)
+ * @param {function} onUpload - Callback for completed upload
  */
-const assetTypes = [
-  { label: "Music", value: "music", accept: "audio/*" },
-  { label: "Image", value: "image", accept: "image/*" },
+const ASSET_TYPES = [
+  { label: "Art", value: "art", accept: "image/*", inputType: "image" },
+  { label: "Music", value: "music", accept: "audio/*", inputType: "audio" },
+  { label: "Design", value: "design", accept: "*", inputType: "file" },
+  { label: "Video", value: "video", accept: "video/*", inputType: "video" },
 ];
 
 const initialState = {
   assetType: "",
-  title: "",
+  assetName: "",
+  creatorName: "",
+  ownershipPct: "",
+  estimatedRoyalty: "",
   file: null,
   previewUrl: "",
   error: "",
@@ -30,8 +38,8 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
     if (!isOpen) setFormData(initialState);
   }, [isOpen]);
 
-  // Handle changing the asset type (resets file/preview for consistency)
-  function handleTypeChange(e) {
+  // Asset type selection
+  function handleAssetTypeChange(e) {
     setFormData({
       ...formData,
       assetType: e.target.value,
@@ -41,34 +49,51 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
     });
   }
 
-  // Handle title change
+  // Generic field input
   function handleInputChange(e) {
-    setFormData({ ...formData, [e.target.name]: e.target.value, error: "" });
+    const { name, value } = e.target;
+    // Only allow digits/period in percentage or royalty fields
+    if (name === "ownershipPct" || name === "estimatedRoyalty") {
+      if (value === "" || /^[0-9]{0,2}(\.[0-9]{0,3})?$/.test(value)) {
+        setFormData({ ...formData, [name]: value, error: "" });
+      }
+    } else {
+      setFormData({ ...formData, [name]: value, error: "" });
+    }
   }
 
-  // Handle file selection and live preview
+  // File input and preview
   function handleFileChange(e) {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Conditional validation per asset type
-    if (
-      (formData.assetType === "music" && !file.type.startsWith("audio/")) ||
-      (formData.assetType === "image" && !file.type.startsWith("image/"))
-    ) {
+    const selectedType = ASSET_TYPES.find(t => t.value === formData.assetType);
+    let error = "";
+    if (selectedType) {
+      if (
+        (selectedType.inputType === "image" && !file.type.startsWith("image/")) ||
+        (selectedType.inputType === "audio" && !file.type.startsWith("audio/")) ||
+        (selectedType.inputType === "video" && !file.type.startsWith("video/"))
+      ) {
+        error = `Invalid file type for ${selectedType.label}.`;
+      }
+    }
+    if (error) {
       setFormData({
         ...formData,
         file: null,
         previewUrl: "",
-        error: "Invalid file type for the selected asset type.",
+        error,
       });
       return;
     }
-    // Generate preview if image
+    // Generate preview
     let previewUrl = "";
-    if (formData.assetType === "image") {
+    if (selectedType?.inputType === "image" || selectedType?.inputType === "video") {
       previewUrl = URL.createObjectURL(file);
-    } else if (formData.assetType === "music") {
+    } else if (selectedType?.inputType === "audio") {
+      previewUrl = URL.createObjectURL(file);
+    } else if (selectedType?.inputType === "file") {
       previewUrl = file.name;
     }
     setFormData({
@@ -79,17 +104,38 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
     });
   }
 
-  // Validate and submit (simulates upload)
+  // Upload/submit validation and event
   function handleUpload(e) {
     e.preventDefault();
-    if (!formData.assetType || !formData.title || !formData.file) {
+    const {assetType, assetName, creatorName, ownershipPct, estimatedRoyalty, file} = formData;
+    if (
+      !assetType ||
+      !assetName.trim() ||
+      !creatorName.trim() ||
+      !ownershipPct ||
+      !estimatedRoyalty ||
+      !file
+    ) {
       setFormData({
         ...formData,
-        error: "Please complete all fields and select a valid file.",
+        error: "Please fill all fields and select an appropriate file.",
       });
       return;
     }
-    onUpload(formData);
+    if (parseFloat(ownershipPct) > 100.0) {
+      setFormData({...formData, error: "Ownership % cannot exceed 100."});
+      return;
+    }
+    if (parseFloat(ownershipPct) <= 0) {
+      setFormData({...formData, error: "Ownership % must be greater than 0."});
+      return;
+    }
+    if (parseFloat(estimatedRoyalty) <= 0) {
+      setFormData({...formData, error: "Royalty must be positive."});
+      return;
+    }
+    // Call mock upload
+    onUpload({...formData}); // Pass the whole form data (you may extract fields elsewhere)
     setFormData(initialState);
     onRequestClose();
   }
@@ -99,26 +145,147 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
     onRequestClose();
   }
 
-  // Modal content: glassmorphic, animated + responsive + scroll if needed
+  // Dynamic file input field
+  function renderFileInput() {
+    if (!formData.assetType) return null;
+    const selectedType = ASSET_TYPES.find(t => t.value === formData.assetType);
+    let label = "Upload File";
+    let accept = "*";
+    let inputType = "file";
+    if (selectedType) {
+      label = `Upload ${selectedType.label} ${selectedType.inputType === "file" ? "File" : ""}`;
+      accept = selectedType.accept;
+      inputType = selectedType.inputType === "file" ? "file" : selectedType.inputType;
+    }
+    let helpText = "";
+    if (selectedType?.inputType === "image") helpText = "Accepts: PNG, JPG, JPEG, GIF.";
+    if (selectedType?.inputType === "audio") helpText = "Accepts: MP3, WAV, OGG. Max 10MB.";
+    if (selectedType?.inputType === "video") helpText = "Accepts: MP4, WebM, MOV. Max 50MB.";
+    if (selectedType?.value === "design") helpText = "Any file (AI, PSD, SVG, PDF, ZIP, etc.).";
+
+    return (
+      <label className="upload-label" style={{ width: "100%", marginBottom: 13 }}>
+        {label}
+        <input
+          key={selectedType.value}
+          required
+          name="file"
+          type="file"
+          accept={accept}
+          onChange={handleFileChange}
+          style={{
+            width: "100%",
+            margin: "6px 0 3px",
+            padding: 7,
+            borderRadius: 8,
+            border: "none",
+            background: "rgba(255,255,255,0.13)",
+            color: "#fff",
+          }}
+        />
+        <small style={{
+          color: "#BAB9E3",
+          fontSize: "13px",
+          marginLeft: 3
+        }}>{helpText}</small>
+      </label>
+    );
+  }
+
+  function renderPreview() {
+    const selectedType = ASSET_TYPES.find(t => t.value === formData.assetType);
+    if (!formData.file || !formData.previewUrl) return null;
+    if (selectedType?.inputType === "image") {
+      return (
+        <div style={{ textAlign: "center", margin: "13px 0 17px" }}>
+          <img
+            alt="Preview"
+            src={formData.previewUrl}
+            style={{
+              maxWidth: "100%",
+              maxHeight: 160,
+              borderRadius: 13,
+              border: "2px dashed #00FFC2",
+              background: "#181828",
+              boxShadow: "0 2px 12px #00FFC233",
+            }}
+          />
+        </div>
+      );
+    }
+    if (selectedType?.inputType === "audio") {
+      return (
+        <div style={{
+          textAlign: "center",
+          margin: "2px 0 17px",
+        }}>
+          <audio controls style={{
+            width: "90%",
+            background: "rgba(24,26,34,0.19)",
+            borderRadius: 10,
+          }}>
+            <source src={formData.previewUrl}/>
+            Your browser does not support the audio element.
+          </audio>
+        </div>
+      );
+    }
+    if (selectedType?.inputType === "video") {
+      return (
+        <div style={{ textAlign: "center", margin: "10px 0 17px" }}>
+          <video
+            controls
+            src={formData.previewUrl}
+            style={{
+              maxWidth: "100%",
+              maxHeight: 160,
+              borderRadius: 13,
+              background: "#000",
+              boxShadow: "0 2px 12px #00FFC233",
+            }}
+          >Your browser does not support the video tag.</video>
+        </div>
+      );
+    }
+    // DESIGN or generic file
+    return (
+      <div style={{
+        textAlign: "center",
+        margin: "15px 0 13px",
+        wordBreak: "break-all"
+      }}>
+        <span style={{
+          padding: "4px 13px",
+          borderRadius: 10,
+          background: "rgba(0,255,194,0.13)",
+          color: "#00FFC2",
+          fontWeight: 600,
+          fontSize: 16,
+        }}>
+          {formData.previewUrl}
+        </span>
+      </div>
+    );
+  }
+
+  // Modal layout: glass, animated, responsive
   return (
-    <Modal open={isOpen} onClose={handleClose}>
+    <Modal open={isOpen} onClose={handleClose} maxWidth="480px">
       <form
         className="upload-asset-form"
         style={{
           minWidth: 260,
-          maxWidth: 430,
+          maxWidth: 440,
           width: "97vw",
-          maxHeight: "95vh",
-          background: "rgba(24,26,34,0.72)",
-          borderRadius: 20,
-          boxShadow: "0 8px 48px rgba(0,0,0,0.27)",
-          padding: "1.7rem 1.1rem 1.1rem 1.1rem",
-          backdropFilter: "blur(17px)",
+          background: "rgba(24,26,34,0.74)",
+          borderRadius: 22,
+          boxShadow: "0 8px 56px rgba(0,0,0,0.27)",
+          padding: "1.75rem 1.4rem 1.25rem 1.4rem",
+          backdropFilter: "blur(18px)",
           position: "relative",
           color: "#fff",
           margin: "0 auto",
-          animation: "fadeInPop 0.36s cubic-bezier(.33,1.5,.58,1) both",
-          overflowY: "auto",         // for oversize screens
+          overflowY: "auto",
           overscrollBehavior: "contain",
           display: "flex",
           flexDirection: "column",
@@ -128,183 +295,198 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
       >
         <h2
           style={{
-            fontSize: 23,
-            fontWeight: 700,
+            fontSize: 24,
+            fontWeight: 800,
             color: "#FFD700",
             letterSpacing: "1px",
             textAlign: "center",
-            marginBottom: 18,
-            textShadow: "0 0 8px #222, 0 2px 12px #FFD70033",
+            marginBottom: 16,
+            textShadow: "0 0 9px #282829, 0 2px 12px #FFD70033",
           }}
         >
           Upload Asset
         </h2>
-        {/* ASSET TYPE */}
-        <label className="upload-label" style={{ margin: "0.5rem 0 0.2rem" }}>
+
+        {/* Field Ordering */}
+        {/* 1. Asset Type */}
+        <label className="upload-label" style={{ margin: "0.5rem 0 0.1rem" }}>
           Asset Type
           <select
             required
             name="assetType"
             value={formData.assetType}
-            onChange={handleTypeChange}
+            onChange={handleAssetTypeChange}
             style={{
               width: "100%",
               padding: "0.6rem",
               borderRadius: 8,
               border: "none",
-              background: "rgba(255,255,255,0.09)",
+              background: "rgba(255,255,255,0.10)",
               color: "#fff",
               fontWeight: 600,
-              fontSize: 14,
+              fontSize: 15,
               outline: "none",
               marginTop: 6,
-              marginBottom: 13,
+              marginBottom: 15,
             }}
             aria-label="Choose asset type"
           >
             <option value="">Select Type</option>
-            {assetTypes.map((type) => (
+            {ASSET_TYPES.map(type => (
               <option key={type.value} value={type.value}>{type.label}</option>
             ))}
           </select>
         </label>
-        {/* TITLE FIELD */}
+
+        {/* 2. Asset Name */}
         <label className="upload-label">
-          Title
+          Asset Name
           <input
             required
-            name="title"
+            name="assetName"
             type="text"
-            placeholder="Asset Title"
-            value={formData.title}
+            placeholder="e.g. Sunrise Canvas"
+            value={formData.assetName}
             onChange={handleInputChange}
             style={{
               width: "100%",
               marginTop: 6,
               marginBottom: 13,
-              padding: "0.7rem",
+              padding: "0.75rem",
               borderRadius: 8,
               border: "none",
-              background: "rgba(255,255,255,0.11)",
+              background: "rgba(255,255,255,0.13)",
               color: "#fff",
               fontWeight: 500,
-              fontSize: 15,
+              fontSize: 16,
               outline: "none",
-              boxShadow: "0 0 0 2px rgba(0,0,0,0.04)",
+              boxShadow: "0 0 0 2px rgba(0,0,0,0.03)",
             }}
           />
         </label>
-        {/* CONDITIONAL FILE UPLOAD INPUTS BY TYPE */}
-        <div style={{ width: "100%" }}>
-          {formData.assetType === "image" && (
-            <label className="upload-label" style={{ width: "100%" }}>
-              Image File
-              <input
-                key="imginput"
-                required
-                name="file"
-                type="file"
-                accept="image/*"
-                onChange={handleFileChange}
-                style={{
-                  width: "100%",
-                  margin: "6px 0 10px",
-                  padding: 6,
-                  borderRadius: 8,
-                  border: "none",
-                  background: "rgba(255,255,255,0.13)",
-                  color: "#fff",
-                }}
-              />
-              <small>JPG, PNG etc.</small>
-            </label>
-          )}
-          {formData.assetType === "music" && (
-            <label className="upload-label" style={{ width: "100%" }}>
-              Audio File
-              <input
-                key="audinput"
-                required
-                name="file"
-                type="file"
-                accept="audio/*"
-                onChange={handleFileChange}
-                style={{
-                  width: "100%",
-                  margin: "6px 0 10px",
-                  padding: 6,
-                  borderRadius: 8,
-                  border: "none",
-                  background: "rgba(255,255,255,0.13)",
-                  color: "#fff",
-                }}
-              />
-              <small>MP3/WAV/OGG files, max 10MB.</small>
-            </label>
-          )}
-        </div>
-        {/* PREVIEW FIELDS */}
-        {formData.assetType === "image" && formData.previewUrl && (
-          <div style={{ textAlign: "center", margin: "13px 0 16px" }}>
-            <img
-              alt="Preview"
-              src={formData.previewUrl}
-              style={{
-                maxWidth: "100%",
-                maxHeight: 155,
-                borderRadius: 13,
-                border: "2px dashed #00FFC2",
-                background: "#222c",
-                boxShadow: "0 2px 12px #00FFC233",
-              }}
-            />
-          </div>
-        )}
-        {formData.assetType === "music" && formData.previewUrl && (
-          <div style={{
-            textAlign: "center",
-            marginTop: 10,
-            marginBottom: 16,
-            wordBreak: "break-all"
-          }}>
-            <span style={{
-              padding: "2px 12px",
-              borderRadius: 10,
-              background: "rgba(0,255,194,0.13)",
-              color: "#00FFC2",
-              fontWeight: 600,
-              fontSize: 15,
-            }}>
-              {formData.previewUrl}
-            </span>
-          </div>
-        )}
-        {/* ERROR HANDLING */}
+
+        {/* 3. Creator Name */}
+        <label className="upload-label">
+          Creator Name
+          <input
+            required
+            name="creatorName"
+            type="text"
+            placeholder="Creator or Owner"
+            value={formData.creatorName}
+            onChange={handleInputChange}
+            style={{
+              width: "100%",
+              marginTop: 6,
+              marginBottom: 13,
+              padding: "0.75rem",
+              borderRadius: 8,
+              border: "none",
+              background: "rgba(255,255,255,0.13)",
+              color: "#fff",
+              fontWeight: 500,
+              fontSize: 16,
+              outline: "none",
+              boxShadow: "0 0 0 2px rgba(0,0,0,0.03)",
+            }}
+          />
+        </label>
+
+        {/* 4. Ownership Percentage */}
+        <label className="upload-label">
+          Ownership Percentage (%)
+          <input
+            required
+            name="ownershipPct"
+            type="number"
+            pattern="[0-9]*"
+            min="0.01"
+            max="100"
+            step="0.01"
+            placeholder="e.g. 60"
+            value={formData.ownershipPct}
+            onChange={handleInputChange}
+            style={{
+              width: "100%",
+              marginTop: 6,
+              marginBottom: 14,
+              padding: "0.75rem",
+              borderRadius: 8,
+              border: "none",
+              background: "rgba(255,255,255,0.13)",
+              color: "#fff",
+              fontWeight: 500,
+              fontSize: 16,
+              outline: "none",
+              boxShadow: "0 0 0 2px rgba(0,0,0,0.03)",
+            }}
+            inputMode="decimal"
+          />
+        </label>
+
+        {/* 5. Estimated Royalty (%) */}
+        <label className="upload-label">
+          Estimated Royalty (%) per year
+          <input
+            required
+            name="estimatedRoyalty"
+            type="number"
+            pattern="[0-9]*"
+            min="0.01"
+            step="0.01"
+            placeholder="e.g. 4.2"
+            value={formData.estimatedRoyalty}
+            onChange={handleInputChange}
+            style={{
+              width: "100%",
+              marginTop: 6,
+              marginBottom: 15,
+              padding: "0.75rem",
+              borderRadius: 8,
+              border: "none",
+              background: "rgba(255,255,255,0.13)",
+              color: "#fff",
+              fontWeight: 500,
+              fontSize: 16,
+              outline: "none",
+              boxShadow: "0 0 0 2px rgba(0,0,0,0.03)",
+            }}
+            inputMode="decimal"
+          />
+        </label>
+
+        {/* 6. File Upload */}
+        {renderFileInput()}
+
+        {/* 7. Preview */}
+        {renderPreview()}
+
+        {/* 8. Error */}
         {formData.error && (
           <div
             style={{
               color: "#ff3967",
               fontWeight: 700,
-              background: "rgba(255,57,103,0.04)",
+              background: "rgba(255,57,103,0.058)",
               borderRadius: 7,
               padding: "6px 8px",
-              marginBottom: 10,
-              marginTop: -2,
+              marginBottom: 12,
               textAlign: "center",
-              boxShadow: "0 2px 6px #FFD70020",
+              boxShadow: "0 2px 8px #FFD7001A",
             }}
           >
             {formData.error}
           </div>
         )}
-        {/* BUTTONS */}
+
+        {/* 9. Actions */}
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: "space-between",
-            marginTop: 10,
-            gap: 14,
+            marginTop: 8,
+            gap: 13,
           }}
         >
           <GradientButton
@@ -312,6 +494,7 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
             style={{
               background: "rgba(255,255,255,0.08)",
               color: "#FFD700",
+              fontWeight: 700,
             }}
             onClick={handleClose}
           >
@@ -321,7 +504,10 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
             type="submit"
             disabled={
               !formData.assetType ||
-              !formData.title ||
+              !formData.assetName ||
+              !formData.creatorName ||
+              !formData.ownershipPct ||
+              !formData.estimatedRoyalty ||
               !formData.file
             }
           >
@@ -329,6 +515,7 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
           </GradientButton>
         </div>
       </form>
+      {/* Responsive scroll styling for modal */}
       <style>{`
         @keyframes fadeInPop {
           0% { opacity: 0; transform: scale(0.89) translateY(27px);}
@@ -343,21 +530,21 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
           background: #222b;
           border-radius: 8px;
         }
-        @media (max-width: 450px) {
+        @media (max-width: 540px) {
           .upload-asset-form {
             max-width: 100vw !important;
             min-width: unset !important;
-            padding: 1.08rem 0.14rem 0.67rem !important;
-            border-radius: 13px !important;
+            padding: 1.1rem 0.23rem 0.67rem !important;
+            border-radius: 14px !important;
             box-shadow: 0 0 32px #FFD70022;
-            max-height: 97vh !important;
+            font-size: 15.1px;
           }
         }
-        @media (max-width: 350px) {
+        @media (max-width: 378px) {
           .upload-asset-form {
-            padding: 0.49rem 0.015rem 0.2rem !important;
+            padding: 0.48rem 0.05rem 0.2rem !important;
             border-radius: 8px !important;
-            font-size: 14px;
+            font-size: 13.4px;
           }
         }
       `}</style>
