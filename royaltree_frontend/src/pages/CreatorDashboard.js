@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
 import AnimatedCounter from "../components/AnimatedCounter";
 import GradientButton from "../components/GradientButton";
@@ -75,12 +74,12 @@ function CreatorDashboard() {
   const numAssets = filteredAssets.length;
 
   // NavBar links (consistency across app)
-  const navLinks = [
-    { label: "Home", href: "/" },
-    { label: "Marketplace", href: "/marketplace" },
-    { label: "Creator", href: "/creator" },
-    { label: "Investor", href: "/investor" }
-  ];
+  // const navLinks = [
+  //   { label: "Home", href: "/" },
+  //   { label: "Marketplace", href: "/marketplace" },
+  //   { label: "Creator", href: "/creator" },
+  //   { label: "Investor", href: "/investor" }
+  // ];
 
   // Stats cards: config objects
   const statCards = [
@@ -194,7 +193,6 @@ function CreatorDashboard() {
 
   return (
     <>
-      <NavBar brandName="Royaltree" links={navLinks} />
       <section className="kavia-container" style={{paddingTop:35,paddingBottom:7,minHeight:160}}>
         <motion.h1 
           className="title"

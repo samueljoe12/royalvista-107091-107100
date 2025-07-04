@@ -101,12 +101,12 @@ function InvestorDashboard() {
   const estAnnualReturn = statAssets.reduce((sum, a) => sum + ((a.estRoyalty || 0) * 200), 0); // Fake formula
   const assetsCount = statAssets.length;
   // NavBar links reused
-  const navLinks = [
-    { label: "Home", href: "/" },
-    { label: "Marketplace", href: "/marketplace" },
-    { label: "Creator", href: "/creator" },
-    { label: "Investor", href: "/investor" }
-  ];
+  // const navLinks = [
+  //   { label: "Home", href: "/" },
+  //   { label: "Marketplace", href: "/marketplace" },
+  //   { label: "Creator", href: "/creator" },
+  //   { label: "Investor", href: "/investor" }
+  // ];
 
   // Modal: detail for owned asset (SPA modal, not page navigation)
   const renderDetailModal = () => (
@@ -193,7 +193,6 @@ function InvestorDashboard() {
 
   return (
     <>
-      <NavBar brandName="Royaltree" links={navLinks} />
       <section className="kavia-container" style={{ paddingTop: 36, paddingBottom: 12, minHeight: 180 }}>
         <motion.h1
           className="title"

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
-import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
 import ChartMock, { defaultBreakdown } from "../components/ChartMock";
 import GradientButton from "../components/GradientButton";
@@ -33,16 +32,15 @@ function IPDetail() {
 
   const breakdown = defaultBreakdown;
 
-  const navLinks = [
-    { label: "Home", href: "/" },
-    { label: "Marketplace", href: "/marketplace" },
-    { label: "Creator", href: "/creator" },
-    { label: "Investor", href: "/investor" }
-  ];
+  // const navLinks = [
+  //   { label: "Home", href: "/" },
+  //   { label: "Marketplace", href: "/marketplace" },
+  //   { label: "Creator", href: "/creator" },
+  //   { label: "Investor", href: "/investor" }
+  // ];
 
   return (
     <>
-      <NavBar brandName="Royaltree" links={navLinks} />
       <section className="kavia-container" style={{ maxWidth: 970, paddingTop: 40, minHeight: 380 }}>
         <motion.div
           className="scroll-fade-in"

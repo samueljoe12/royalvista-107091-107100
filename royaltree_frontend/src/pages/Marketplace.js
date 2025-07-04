@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import AssetCard from "../components/AssetCard";
-import NavBar from "../components/NavBar";
 import TabSwitcher from "../components/TabSwitcher";
 import GradientButton from "../components/GradientButton";
 import useGeolocation from "../hooks/useGeolocation";
@@ -162,12 +161,12 @@ function Marketplace() {
   }
 
   // NavBar links
-  const navLinks = [
-    { label: "Home", href: "/" },
-    { label: "Marketplace", href: "/marketplace" },
-    { label: "Creator", href: "/creator" },
-    { label: "Investor", href: "/investor" }
-  ];
+  // const navLinks = [
+  //   { label: "Home", href: "/" },
+  //   { label: "Marketplace", href: "/marketplace" },
+  //   { label: "Creator", href: "/creator" },
+  //   { label: "Investor", href: "/investor" }
+  // ];
 
   let regionFilterUI = null;
   if (geo && !geo.loading && !geo.error && (geo.city || geo.region || geo.country)) {
@@ -213,7 +212,6 @@ function Marketplace() {
 
   return (
     <>
-      <NavBar brandName="Royaltree" links={navLinks} geoData={geo} />
       <section className="kavia-container" style={{paddingTop:38,paddingBottom:9,minHeight:120}}>
         <div style={{
           display: "flex",
