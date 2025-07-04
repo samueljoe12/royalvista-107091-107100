@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
 import AnimatedCounter from "../components/AnimatedCounter";
+import GradientButton from "../components/GradientButton";
+import InvestModal from "../components/InvestModal";
 import { motion } from "framer-motion";
 import { fadeInUp } from "../utils/animationPresets";
 import mockAssets from "../data/mockAssets";
@@ -14,44 +16,66 @@ import mockTransactions from "../data/mockTransactions";
  */
 function InvestorDashboard() {
   // Use mockAssets for owned assets, and mockTransactions for activity
-  const ownedAssets = mockAssets.slice(0, 3).map(asset => ({
-    ...asset,
-    badges: asset.badges.map(b => (
-      <span
-        key={b.key + "-" + asset.id}
-        className="asset-subtitle"
-        style={{
-          background: b.style.background,
-          padding: "4px 10px",
-          borderRadius: "9px",
-          fontWeight: 700,
-          fontSize: 13,
-          color: b.style.color
+  // State to control modal open/close and selected asset for investing
+  const [showInvest, setShowInvest] = useState(false);
+  const [selectedAsset, setSelectedAsset] = useState(null);
+
+  const ownedAssets = mockAssets.slice(0, 3).map(asset => {
+    const investBtn = (
+      <GradientButton
+        style={{ marginTop: 12, minWidth: 0 }}
+        wide
+        onClick={e => {
+          e.stopPropagation();
+          setSelectedAsset(asset);
+          setShowInvest(true);
         }}
+        icon={<span style={{ fontSize: 19 }}>💸</span>}
       >
-        {b.text}
-      </span>
-    )),
-    footer: (
-      <div>
-        <div style={{
-          color: "#FFD700",
-          fontWeight: 600,
-          fontSize: 15.5,
-          letterSpacing: 0.01
-        }}>
-          Projected Returns
+        Invest More
+      </GradientButton>
+    );
+    return {
+      ...asset,
+      badges: asset.badges.map(b => (
+        <span
+          key={b.key + "-" + asset.id}
+          className="asset-subtitle"
+          style={{
+            background: b.style.background,
+            padding: "4px 10px",
+            borderRadius: "9px",
+            fontWeight: 700,
+            fontSize: 13,
+            color: b.style.color
+          }}
+        >
+          {b.text}
+        </span>
+      )),
+      footer: (
+        <div>
+          <div style={{
+            color: "#FFD700",
+            fontWeight: 600,
+            fontSize: 15.5,
+            letterSpacing: 0.01
+          }}>
+            Projected Returns
+          </div>
+          <AnimatedCounter
+            value={asset.stats.userEarnings * 0.43}
+            prefix="$"
+            decimals={2}
+            color="#FFD700"
+            style={{ fontSize: 21, marginTop: 2 }}
+          />
+          {investBtn}
         </div>
-        <AnimatedCounter
-          value={asset.stats.userEarnings * 0.43}
-          prefix="$"
-          decimals={2}
-          color="#FFD700"
-          style={{ fontSize: 21, marginTop: 2 }}
-        />
-      </div>
-    )
-  }));
+      ),
+      onClick: () => {}, // Remain clickable for card but don't open anything for now
+    };
+  });
 
   const transactions = mockTransactions;
 
@@ -316,6 +340,12 @@ function InvestorDashboard() {
       </section>
       {/* Responsive adjustment for mobile/tablet */}
       {/* Responsiveness now handled by global App.css media queries */}
+      <InvestModal
+        open={showInvest}
+        onClose={() => setShowInvest(false)}
+        asset={selectedAsset}
+        mockDefaultAmount={200}
+      />
     </>
   );
 }

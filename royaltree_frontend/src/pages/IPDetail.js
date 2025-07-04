@@ -3,12 +3,12 @@ import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
 import ChartMock, { defaultBreakdown } from "../components/ChartMock";
 import GradientButton from "../components/GradientButton";
-import Modal from "../components/Modal";
 import AnimatedCounter from "../components/AnimatedCounter";
 import { motion } from "framer-motion";
 import { fadeInUp } from "../utils/animationPresets";
 import mockAssets from "../data/mockAssets";
 import MockAudioPlayer from "../components/MockAudioPlayer";
+import InvestModal from "../components/InvestModal";
 
 // PUBLIC_INTERFACE
 /**
@@ -294,73 +294,12 @@ function IPDetail() {
         </motion.div>
       </section>
       {/* Invest Modal - glassmorphic, animated, mocks investment */}
-      <Modal open={showInvest} onClose={() => setShowInvest(false)} maxWidth="390px">
-        <motion.div
-          initial={{ opacity: 0, y: 26 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
-          <div style={{
-            fontWeight: 800,
-            fontSize: 21,
-            color: "#FFD700",
-            textAlign: "center",
-            marginBottom: 11
-          }}>
-            Invest in <span style={{ color: "#00FFC2" }}>{asset.title}</span>
-          </div>
-          <div style={{
-            color: "#fff",
-            fontSize: 16,
-            opacity: 0.89,
-            marginBottom: 14,
-            textAlign: "center"
-          }}>
-            (Investment simulation only&mdash;no blockchain or payments. Enter an amount below.)
-          </div>
-          {/* Simple input form - disabled for mock */}
-          <input
-            type="number"
-            placeholder="Amount (USD)"
-            min="25"
-            step="1"
-            style={{
-              width: "100%",
-              padding: "13px 12px",
-              fontSize: 16.3,
-              color: "#FFD700",
-              background: "rgba(0,255,194,0.08)",
-              border: "1px solid #FFD70033",
-              borderRadius: 8,
-              marginBottom: 19,
-              outline: "none"
-            }}
-            disabled
-            value=""
-            aria-label="Investment amount (mocked)"
-          />
-          <GradientButton
-            wide
-            disabled={true}
-            onClick={() => null}
-          >
-            <span style={{
-              fontWeight: 700,
-              fontSize: 17.5
-            }}>
-              Confirm Investment (Soon)
-            </span>
-          </GradientButton>
-          <div style={{
-            textAlign: "center",
-            fontSize: 12.9,
-            marginTop: 17,
-            color: "#bab9e3",
-            fontStyle: "italic"
-          }}>
-            Live investment and payments coming soon.<br />Contact Royaltree to join early testing!
-          </div>
-        </motion.div>
-      </Modal>
+      <InvestModal
+        open={showInvest}
+        onClose={() => setShowInvest(false)}
+        asset={asset}
+        mockDefaultAmount={250}
+      />
       {/* Responsive fallback: Single column on mobile/tablet handled via App.css */}
     </>
   );
