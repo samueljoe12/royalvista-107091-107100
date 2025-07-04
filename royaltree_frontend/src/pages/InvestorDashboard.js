@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
 import AnimatedCounter from "../components/AnimatedCounter";
@@ -18,6 +19,7 @@ import mockTransactions from "../data/mockTransactions";
  * owned assets/animated stats, modal-based asset detail/music, and invest flow using mock data.
  */
 function InvestorDashboard() {
+  const navigate = useNavigate();
   // Dashboard tabs: "assets" | "transactions"
   const [activeTab, setActiveTab] = useState("assets");
   // Asset Invest modal and detail/modal logic
@@ -30,7 +32,6 @@ function InvestorDashboard() {
 
   // --- Dynamic Owned Assets: Robust stat, click, badge, modal logic ---
   // If "assets" tab, only display mock owned assets (slice for demo) and recalc metrics!
-
   // Safely slice from mock data, bulletproof badge rendering
   const ownedAssetsRaw = mockAssets.slice(0, 3).map(asset => {
     const investBtn = (
@@ -85,10 +86,6 @@ function InvestorDashboard() {
           {investBtn}
         </div>
       ),
-      onClick: () => {
-        setDetailAsset(asset);
-        setShowDetail(true);
-      },
     };
   });
   // Assets/transactions for tab views
@@ -159,7 +156,7 @@ function InvestorDashboard() {
             style={{ marginTop: 2 }}
             onClick={() => {
               setShowDetail(false);
-              setTimeout(() => window.location.assign(`/ip/${detailAsset.id}`), 120);
+              setTimeout(() => navigate(`/ip/${detailAsset.id}`), 120);
             }}
           >
             View Details
@@ -381,7 +378,7 @@ function InvestorDashboard() {
                 <AssetCard
                   key={asset.title + "-" + i}
                   {...asset}
-                  onClick={() => { setDetailAsset(asset); setShowDetail(true); }}
+                  onClick={() => navigate(`/ip/${asset.id}`)}
                 />
               ))}
             </div>

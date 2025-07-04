@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
 import AnimatedCounter from "../components/AnimatedCounter";
@@ -21,6 +22,7 @@ import mockAssets from "../data/mockAssets";
  */
 
 function CreatorDashboard() {
+  const navigate = useNavigate();
   // Tabbed view state and modal/asset management
   const [activeTab, setActiveTab] = useState("all");
   const [showDetail, setShowDetail] = useState(false);
@@ -161,7 +163,7 @@ function CreatorDashboard() {
             style={{ marginTop: 2 }}
             onClick={() => {
               setShowDetail(false);
-              setTimeout(() => window.location.assign(`/ip/${detailAsset.id}`), 120);
+              setTimeout(() => navigate(`/ip/${detailAsset.id}`), 120);
             }}
           >
             View Details

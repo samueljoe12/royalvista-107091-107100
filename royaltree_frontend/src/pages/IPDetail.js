@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useParams } from "react-router-dom";
 import NavBar from "../components/NavBar";
 import AssetCard from "../components/AssetCard";
 import ChartMock, { defaultBreakdown } from "../components/ChartMock";
@@ -10,20 +11,15 @@ import mockAssets from "../data/mockAssets";
 import MockAudioPlayer from "../components/MockAudioPlayer";
 import InvestModal from "../components/InvestModal";
 
-// PUBLIC_INTERFACE
 /**
+ * PUBLIC_INTERFACE
  * IPDetail - Detailed view for a single digital asset/IP.
- * Features:
- *  1. Asset preview (image/audio mock/with type check).
- *  2. Royalty Breakdown Chart using ChartMock and styled placeholder data.
- *  3. Animated Invest button that triggers a glassmorphic investment modal.
- * The design is modern, glassmorphic, uses Royaltree's colors and animations, fully responsive.
- *
- * Data: Uses mockAssets and ChartMock's placeholder breakdown.
+ * Reads assetId from :id route param, loads matching mock asset. Displays full detail.
  */
 function IPDetail() {
-  // Demo: Use first asset and branch logic by subtitle (music with "audio", else image).
-  const asset = mockAssets[0] || {
+  const { id } = useParams();
+  // Find the asset in mockAssets with the id, fallback to the first asset
+  const asset = mockAssets.find(a => a.id === id) || mockAssets[0] || {
     title: "Untitled Asset",
     subtitle: "",
     image: "",
@@ -33,15 +29,10 @@ function IPDetail() {
   };
   const [showInvest, setShowInvest] = useState(false);
 
-  // Use subtitle/type to mock image vs. audio preview.
-  // If asset.subtitle includes "Music", show an audio mock, else show image.
-  // For demo, if mockAssets[0], it's Music / Song, so show audio mock below image.
   const isAudio = typeof asset.subtitle === "string" && asset.subtitle.toLowerCase().includes("music");
 
-  // Royalty breakdown, always ChartMock with demo data.
   const breakdown = defaultBreakdown;
 
-  // NavBar links, consistent with the app.
   const navLinks = [
     { label: "Home", href: "/" },
     { label: "Marketplace", href: "/marketplace" },
@@ -113,7 +104,7 @@ function IPDetail() {
                     />
                   </div>
                 }
-                onClick={null}
+                onClick={() => {}} // Doesn't do anything on detail page
               />
               {/* Modern Mock Audio Player, only for music/audio assets */}
               {isAudio && (
@@ -128,9 +119,7 @@ function IPDetail() {
                   <MockAudioPlayer
                     title={typeof asset.title === "string" ? asset.title : "Music Preview"}
                     autoPlay={false}
-                    // Use additional props if expand in future; the player manages mock state internally
                   />
-                  {/* Callout: visually link this as a music/audio preview */}
                   <div
                     style={{
                       marginLeft: 16,

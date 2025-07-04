@@ -2,6 +2,7 @@ import React from "react";
 import { motion, useAnimation, useInView } from "framer-motion";
 import GradientButton from "../components/GradientButton";
 import AssetCard from "../components/AssetCard";
+import mockAssets from "../data/mockAssets";
 import {
   fadeInUp,
   fadeIn,
@@ -21,59 +22,33 @@ function LandingPage({ geoData }) {
   const [audioPlaying, setAudioPlaying] = React.useState(false);
   const [lastPlayed, setLastPlayed] = React.useState(null);
 
-  // AssetCard demo data, using interactive navigation and demo audio
-  const assetMocks = [
-    {
-      image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&w=600&q=80",
-      title: "Gold Soundtrack",
-      subtitle: "Music / Song",
-      owner: "Alice King",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.12)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>37% Owned</span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.13)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 4.2%/yr</span>
-      ],
-      onClick: () => navigate("/ip/asset-001"),
-      audioDemo: true,
-      onAudioDemoClick: () => { setAudioPlaying(true); setLastPlayed("Gold Soundtrack"); setTimeout(() => setAudioPlaying(false), 1000); }
-    },
-    {
-      image: "https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&w=600&q=80",
-      title: "Arcane Art Piece",
-      subtitle: "Visual Art",
-      owner: "Carlos Wu",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.13)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>20% Owned</span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.11)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 2.1%/yr</span>
-      ],
-      onClick: () => navigate("/ip/asset-002"),
-      audioDemo: false
-    },
-    {
-      image: "https://images.unsplash.com/photo-1465101162946-4377e57745c3?auto=format&w=600&q=80",
-      title: "Futurist Novel",
-      subtitle: "Literature",
-      owner: "Morgan Lee",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.11)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>12% Owned</span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.14)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 6.7%/yr</span>
-      ],
-      onClick: () => navigate("/ip/asset-003"),
-      audioDemo: false
-    },
-    {
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&w=600&q=80",
-      title: "Pop Single Rights",
-      subtitle: "Music / Rights",
-      owner: "Devon Green",
-      badges: [
-        <span key="badge1" className="asset-subtitle" style={{background:'rgba(0,255,194,0.13)',padding:'4px 10px',borderRadius:'9px',fontWeight:700,fontSize:12}}>49% Owned</span>,
-        <span key="badge2" style={{background:'rgba(255,215,0,0.11)',padding:'4px 9px',borderRadius:'9px',fontWeight:700, fontSize:11, color:'#FFD700'}}>Est. 3.1%/yr</span>
-      ],
-      onClick: () => navigate("/ip/asset-004"),
-      audioDemo: true,
-      onAudioDemoClick: () => { setAudioPlaying(true); setLastPlayed("Pop Single Rights"); setTimeout(() => setAudioPlaying(false), 1000); }
-    }
-  ];
+  // Use the first four mockAssets as showcase in the landing page grid
+  const assetMocks = mockAssets.slice(0, 4).map((asset, idx) => ({
+    image: asset.image,
+    title: asset.title,
+    subtitle: asset.subtitle,
+    owner: asset.owner,
+    badges: asset.badges?.map((b, i) =>
+      <span
+        key={`badge-${b.key}-${asset.id}`}
+        className="asset-subtitle"
+        style={{
+          background: b.style?.background, color: b.style?.color,
+          padding: '4px 10px', borderRadius: '9px',
+          fontWeight: 700, fontSize: 12, marginRight: 3
+        }}
+      >{b.text}</span>
+    ),
+    onClick: () => navigate(`/ip/${asset.id}`),
+    audioDemo: typeof asset.subtitle === "string" && asset.subtitle.toLowerCase().includes("music"),
+    onAudioDemoClick: typeof asset.subtitle === "string" && asset.subtitle.toLowerCase().includes("music")
+      ? (() => {
+          setAudioPlaying(true);
+          setLastPlayed(asset.title);
+          setTimeout(() => setAudioPlaying(false), 1000);
+        })
+      : undefined,
+  }));
 
   // Section animation hooks
   const ref = React.useRef(null);

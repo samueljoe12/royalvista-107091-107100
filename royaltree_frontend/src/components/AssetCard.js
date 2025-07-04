@@ -12,7 +12,7 @@ import { cardHover } from "../utils/animationPresets";
  * @param {string|ReactNode} owner Creator/owner name or placeholder
  * @param {React.Component[]} badges Array of badge components (ownership %, etc.)
  * @param {React.Component} footer Custom footer (shows available % and est. royalty; optional)
- * @param {Function} onClick
+ * @param {Function} onClick Handler for card click (required for asset navigation)
  */
 function AssetCard({ image, title, subtitle, owner, badges = [], footer, onClick, audioDemo, onAudioDemoClick }) {
   // Let this component optionally render a mock audio "play" below the card if audioDemo is true
@@ -107,7 +107,7 @@ AssetCard.propTypes = {
   owner: PropTypes.string,
   badges: PropTypes.array,
   footer: PropTypes.node,
-  onClick: PropTypes.func,
+  onClick: PropTypes.func.isRequired, // Now required
 };
 
 export default AssetCard;
