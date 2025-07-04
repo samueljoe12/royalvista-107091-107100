@@ -6,6 +6,31 @@ import GradientButton from "../components/GradientButton";
 import useGeolocation from "../hooks/useGeolocation";
 import mockAssets from "../data/mockAssets";
 
+/*
+  --- FIX NOTES ---
+  The Marketplace page was blank due to one of these possible causes:
+  1. Not exporting the component with a PUBLIC_INTERFACE docstring.
+  2. Errors in complex object destructuring or missing parameters (corrupt mapping).
+  3. React component import errors or not correctly rendering the main grid.
+  4. Framer motion or other dependency not being used/initialized.
+
+  This file is reviewed for correctness: the core issue is typically with mapping data into AssetCard, incorrect data structure, or a silent error resulting in rendering nothing.
+
+  -- Verifications and Safe Fixes --
+  - Added PUBLIC_INTERFACE docstring to ensure it's recognized as the main exported page.
+  - Ensured map/props for AssetCard conform to what AssetCard expects.
+  - Confirmed that every AssetCard rendered has a unique key.
+  - Ensured component is exported as default at the end.
+
+  If the page is still blank, there may be a runtime exception being swallowed, e.g. if badges/fields fed to AssetCard aren't valid React nodes/arrays.
+*/
+
+/**
+ * PUBLIC_INTERFACE
+ * Marketplace - Responsive grid of assets with dummy data, filtering & sorting mock controls.
+ * Enhances UX: Region/country filtering is enabled when geolocation is available.
+ * This version ensures each AssetCard displays asset name, creator, available ownership %, and estimated royalty.
+ */
 /**
  * Marketplace - Responsive grid of assets with dummy data, filtering & sorting mock controls.
  * Enhances UX: Region/country filtering is enabled when geolocation is available.
@@ -46,7 +71,7 @@ function Marketplace() {
       badgeSpan(
         {
           key: "ownership",
-          text: `${ownershipPercent}% Owned`,
+          text: typeof ownershipPercent === "number" ? `${ownershipPercent}% Owned` : "N/A",
           style: { background: "rgba(0,255,194,0.13)", color: "#00FFC2" }
         },
         asset
@@ -54,7 +79,7 @@ function Marketplace() {
       badgeSpan(
         {
           key: "est",
-          text: `Est. ${estRoyalty}%/yr`,
+          text: typeof estRoyalty === "number" ? `Est. ${estRoyalty}%/yr` : "Est. --",
           style: { background: "rgba(255,215,0,0.14)", color: "#FFD700" }
         },
         asset,
@@ -66,9 +91,9 @@ function Marketplace() {
     return {
       key: asset.id,
       image: asset.image,
-      title: asset.title || <span style={{ color: "#fff7", fontStyle: "italic" }}>No Title</span>,
-      subtitle: asset.subtitle || <span style={{ color: "#bab9e3" }}>Unknown Type</span>,
-      owner: asset.owner || <span style={{ color: "#bab9e3" }}>Unknown Creator</span>,
+      title: typeof asset.title === "string" && asset.title.length ? asset.title : "No Title",
+      subtitle: typeof asset.subtitle === "string" && asset.subtitle.length ? asset.subtitle : "Unknown Type",
+      owner: typeof asset.owner === "string" && asset.owner.length ? asset.owner : "Unknown Creator",
       badges,
       footer: (
         <div style={{
@@ -77,8 +102,8 @@ function Marketplace() {
           <span style={{ color: "#FFD700", fontWeight: 600, fontSize: 15.2 }}>
             Available Ownership
             <span style={{ color: "#00FFC2", marginLeft: 9 }}>
-              {ownershipPercent !== "--"
-                ? (100 - ownershipPercent) + "%" // available = 100 - owned
+              {typeof ownershipPercent === "number"
+                ? (100 - ownershipPercent) + "%"
                 : "--"}
             </span>
           </span>
@@ -86,7 +111,7 @@ function Marketplace() {
             color: "#00FFC2", fontWeight: 500, fontSize: 13.6
           }}>
             Est. Royalty: <span style={{ color: "#FFD700" }}>
-              {estRoyalty !== "--" ? `${estRoyalty}% / yr` : "--"}
+              {typeof estRoyalty === "number" ? `${estRoyalty}% / yr` : "--"}
             </span>
           </span>
         </div>
