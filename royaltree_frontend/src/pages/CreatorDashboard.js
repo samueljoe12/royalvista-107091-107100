@@ -9,7 +9,7 @@ import MockAudioPlayer from "../components/MockAudioPlayer";
 import { motion } from "framer-motion";
 import { fadeInUp } from "../utils/animationPresets";
 import mockAssets from "../data/mockAssets";
-
+import UploadAssetModal from "../components/UploadAssetModal";
 /**
  * CreatorDashboard - Displays the creator's uploaded IP assets and animated statistics.
  * Sections:
@@ -28,40 +28,84 @@ function CreatorDashboard() {
   const [detailAsset, setDetailAsset] = useState(null);
   const [showMusicModal, setShowMusicModal] = useState(false);
   const [musicAsset, setMusicAsset] = useState(null);
-  
-  // --- Asset view generation, with dynamic badges, for robust tab switching ---
-  // Show "all" or "music" in the current tab
-  const rawAssets = mockAssets.map(asset => ({
-    ...asset,
-    owner: "You",
-    badges: [
-      <span key={"sold-" + asset.id} className="asset-subtitle" style={{
-        background: (asset.badges?.[0]?.style?.background) || "rgba(0,255,194,0.13)",
-        color: (asset.badges?.[0]?.style?.color) || "#00FFC2",
-        padding: "4px 10px",
-        borderRadius: "9px",
-        fontWeight: 700,
-        fontSize: 13
-      }}>
-        {Math.round((asset.ownership ?? 0) * 100)}% Sold
-      </span>,
-      <span key={"earned-" + asset.id}
-        style={{
-          background: "rgba(255,215,0,0.13)",
-          color: "#FFD700",
-          padding: "4px 9px",
+  // NEW: Asset upload modal
+  const [uploadModalOpen, setUploadModalOpen] = useState(false);
+  // NEW: Local asset list for demo asset addition (start from mockAssets)
+  const [userAssets, setUserAssets] = useState(() =>
+    mockAssets.map(asset => ({
+      ...asset,
+      owner: "You",
+      badges: [
+        <span key={"sold-" + asset.id} className="asset-subtitle" style={{
+          background: (asset.badges?.[0]?.style?.background) || "rgba(0,255,194,0.13)",
+          color: (asset.badges?.[0]?.style?.color) || "#00FFC2",
+          padding: "4px 10px",
           borderRadius: "9px",
           fontWeight: 700,
-          fontSize: 12
+          fontSize: 13
         }}>
-        ${asset.stats?.userEarnings?.toLocaleString(undefined, { minimumFractionDigits: 2 }) ?? "0.00"}
-        {" "}Earned
-      </span>
-    ]
-  }));
+          {Math.round((asset.ownership ?? 0) * 100)}% Sold
+        </span>,
+        <span key={"earned-" + asset.id}
+          style={{
+            background: "rgba(255,215,0,0.13)",
+            color: "#FFD700",
+            padding: "4px 9px",
+            borderRadius: "9px",
+            fontWeight: 700,
+            fontSize: 12
+          }}>
+          ${asset.stats?.userEarnings?.toLocaleString(undefined, { minimumFractionDigits: 2 }) ?? "0.00"}
+          {" "}Earned
+        </span>
+      ]
+    }))
+  );
+  // Handler for adding new uploaded asset (mock, prepend for demo)
+  function handleAssetUpload(newAsset) {
+    setUserAssets(prev =>
+      [
+        {
+          ...newAsset,
+          owner: "You",
+          badges: [
+            <span key={"sold-" + newAsset.id} className="asset-subtitle" style={{
+              background: (newAsset.badges?.[0]?.style?.background) || "rgba(0,255,194,0.13)",
+              color: (newAsset.badges?.[0]?.style?.color) || "#00FFC2",
+              padding: "4px 10px",
+              borderRadius: "9px",
+              fontWeight: 700,
+              fontSize: 13
+            }}>
+              {Math.round((newAsset.ownership ?? 0) * 100)}% Sold
+            </span>,
+            <span key={"earned-" + newAsset.id}
+              style={{
+                background: "rgba(255,215,0,0.13)",
+                color: "#FFD700",
+                padding: "4px 9px",
+                borderRadius: "9px",
+                fontWeight: 700,
+                fontSize: 12
+              }}>
+              ${(newAsset.stats?.userEarnings != null
+                  ? newAsset.stats.userEarnings
+                  : 0
+                ).toLocaleString(undefined, { minimumFractionDigits: 2 })}
+              {" "}Earned
+            </span>
+          ]
+        },
+        ...prev
+      ]
+    );
+    setUploadModalOpen(false);
+  }
 
-  const assets = rawAssets;
-  const assetsMusic = rawAssets.filter(a => typeof a.subtitle === "string" && a.subtitle.toLowerCase().includes("music"));
+  // --- Asset view generation, with dynamic badges, for robust tab switching ---
+  // Show "all" or "music" in the current tab
+  const assets = userAssets;
+  const assetsMusic = userAssets.filter(a => typeof a.subtitle === "string" && a.subtitle.toLowerCase().includes("music"));
 
   // Responsive tab filter: only update metrics & grid content that matches tab
   let filteredAssets = activeTab === "music" ? assetsMusic : assets;
@@ -194,6 +238,32 @@ function CreatorDashboard() {
   return (
     <>
       <section className="kavia-container" style={{paddingTop:35,paddingBottom:7,minHeight:160}}>
+        {/* Top "Upload Asset" Button */}
+        <motion.div
+          style={{
+            display: "flex",
+            justifyContent: "flex-end",
+            width: "100%",
+            marginBottom: 12
+          }}
+          initial={{ opacity: 0, y: -18 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+        >
+          <GradientButton
+            icon={<span style={{fontSize:18}}>＋</span>}
+            onClick={() => setUploadModalOpen(true)}
+            wide={false}
+            style={{
+              fontSize: 17,
+              minWidth: 180,
+              padding: "14px 29px",
+              letterSpacing: "0.01em"
+            }}
+          >
+            Upload New Asset
+          </GradientButton>
+        </motion.div>
         <motion.h1 
           className="title"
           style={{
@@ -322,19 +392,7 @@ function CreatorDashboard() {
             ))}
           </div>
         </motion.div>
-        <motion.div
-          style={{ marginTop: 36, textAlign: "right", width: "100%" }}
-          initial={{ opacity: 0, y: 25 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.20 }}
-        >
-          <GradientButton
-            onClick={() => window.location.href = "/marketplace"}
-            icon={<span style={{fontSize:18}}>＋</span>}
-          >
-            Upload New Asset (Coming Soon)
-          </GradientButton>
-        </motion.div>
+        {/* Deprecated old upload coming soon button, now redundant */}
       </section>
 
       {/* Asset detail modal */}
@@ -342,6 +400,13 @@ function CreatorDashboard() {
 
       {/* Subview modal for music preview, if any */}
       {renderMusicModal()}
+
+      {/* Upload New Asset modal */}
+      <UploadAssetModal
+        open={uploadModalOpen}
+        onClose={() => setUploadModalOpen(false)}
+        onSubmit={handleAssetUpload}
+      />
     </>
   );
 }
