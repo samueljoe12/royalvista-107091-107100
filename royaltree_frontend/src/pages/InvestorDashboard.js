@@ -21,6 +21,7 @@ function InvestorDashboard() {
   const [selectedAsset, setSelectedAsset] = useState(null);
 
   const ownedAssets = mockAssets.slice(0, 3).map(asset => {
+    // Hook up "Invest More" button to open InvestModal with asset details
     const investBtn = (
       <GradientButton
         style={{ marginTop: 12, minWidth: 0 }}
@@ -73,7 +74,11 @@ function InvestorDashboard() {
           {investBtn}
         </div>
       ),
-      onClick: () => {}, // Remain clickable for card but don't open anything for now
+      onClick: () => {
+        // Optionally, could also open Invest modal from card if desired
+        setSelectedAsset(asset);
+        setShowInvest(true);
+      },
     };
   });
 
