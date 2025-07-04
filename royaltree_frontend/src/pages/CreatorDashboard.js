@@ -253,26 +253,7 @@ function CreatorDashboard() {
         </motion.div>
       </section>
       {/* Responsive mobile adjustment */}
-      <style>
-        {`
-          @media (max-width: 950px) {
-            .asset-grid {
-              grid-template-columns: 1fr !important;
-              gap: 18px 2vw !important;
-              padding: 0 5vw 18px 5vw !important;
-            }
-          }
-          @media (max-width: 650px) {
-            .kavia-container {
-              padding: 13px !important;
-            }
-            .asset-grid {
-              padding: 0 2vw 10px 2vw !important;
-              gap: 12px !important;
-            }
-          }
-        `}
-      </style>
+      {/* (App-wide responsive styles are now handled globally in App.css) */}
     </>
   );
 }

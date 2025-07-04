@@ -1,5 +1,6 @@
 /* THEME VARIABLES & GLASSMORPHISM ENHANCED BASE
  * Dark theme, Kavia/Royaltree brand, glassmorphism, gradients, glows, responsive cards, nav, hero
+ * Updated for improved mobile-first full responsiveness, touch usability, and type scaling.
 */
 :root {
   --kavia-gold: #FFD700;
@@ -242,19 +243,201 @@ body,
 }
 
 /* RESPONSIVE & MOBILE ADJUSTMENTS */
-@media (max-width: 650px) {
+
+/* NAVBAR - responsive hamburger + stacking */
+@media (max-width: 950px) {
   .navbar-glass {
-    padding: 0 1rem !important;
+    padding: 0 0.7rem !important;
+    min-height: 54px !important;
     height: 56px !important;
+    flex-direction: row;
+  }
+  .navbar-links {
+    gap: 19px !important;
+  }
+}
+@media (max-width: 790px) {
+  .navbar-glass {
+    flex-direction: column;
+    gap: 7px;
+    height: auto !important;
+    padding: 0.5rem 0.5rem !important;
+  }
+  .navbar-links {
+    flex-wrap: wrap;
+    gap: 11px !important;
+    justify-content: center !important;
+    width: 100%;
+    margin-top: 2px;
+  }
+}
+/* COLLAPSE NAVBAR TO MOBILE/TOUCH FRIENDLY BAR */
+@media (max-width: 540px) {
+  .navbar-glass {
+    flex-direction: column;
+    gap: 3px;
+    min-height: unset;
+    padding: 0.6rem 2vw !important;
+  }
+  .navbar-links {
+    flex-wrap: wrap !important;
+    gap: 7px !important;
+    margin-top: 2px;
+  }
+  .theme-toggle {
+    top: 9px;
+    right: 6vw;
+    padding: 8px 14px;
+    font-size: 14.8px;
+  }
+}
+
+/* HERO/LAYOUT */
+@media (max-width: 670px) {
+  .kavia-container, .container {
+    padding: 8px !important;
+    width: 100vw;
   }
   .hero-gradient-bg {
-    padding: 32px 8px 19px 8px;
-    border-radius: 19px;
-    min-height: 200px;
+    padding: 24px 5px 13px 5px !important;
+    border-radius: 13px !important;
+    min-height: 135px !important;
+  }
+  .asset-grid {
+    grid-template-columns: 1fr !important;
+    padding: 0 1vw 10px 1vw !important;
+    gap: 10px 1vw !important;
+  }
+  .asset-card-glass {
+    min-width: unset !important;
+    max-width: 98vw !important;
+    font-size: 15.2px;
   }
   .title, h1, .hero-title {
-    font-size: 2rem;
+    font-size: 1.22rem !important;
   }
+  .subtitle, h2 {
+    font-size: 1rem !important;
+  }
+}
+
+/* CARD/TABLET ADJUSTMENTS */
+@media (max-width: 950px) {
+  .kavia-container {
+    padding: 13px !important;
+  }
+  .asset-grid {
+    grid-template-columns: 1fr !important;
+    gap: 18px 2vw !important;
+    padding: 0 5vw 18px 5vw !important;
+  }
+}
+@media (max-width: 420px) {
+  .asset-card-glass {
+    font-size: 13.5px !important;
+  }
+}
+
+/* BUTTONS & TOUCH TARGETS */
+@media (max-width: 550px) {
+  .btn, .gradient-btn, button, input, select {
+    font-size: 15px !important;
+    padding: 11px 9px !important;
+    min-width: 44px;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+}
+
+/* FORM/INPUTS */
+.input-form-glass input,
+input[type="search"],
+input[type="text"], input[type="email"], input[type="number"], select {
+  font-size: 1rem;
+  min-width: 0;
+}
+@media (max-width: 500px) {
+  .input-form-glass {
+    padding: 1rem 0.6rem !important;
+    min-width: unset !important;
+    width: 99vw !important;
+  }
+}
+
+/* TABLE RESPONSIVENESS */
+@media (max-width: 800px) {
+  table {
+    font-size: 14.1px !important;
+    min-width: 250px !important;
+    overflow-x: auto;
+    display: block;
+  }
+  th, td {
+    padding: 7px 6px !important;
+    word-break: break-word;
+  }
+}
+@media (max-width: 450px) {
+  table, th, td {
+    font-size: 12px !important;
+    padding: 4px 2px !important;
+  }
+}
+
+/* FONT SCALING FOR HEADINGS & TITLES */
+@media (max-width: 440px) {
+  .title, h1, .hero-title {
+    font-size: 1.07rem !important;
+    line-height: 1.08 !important;
+  }
+  .subtitle, h2 {
+    font-size: 0.92rem !important;
+  }
+}
+
+/* MAKE MODALS USABLE ON SMALL SCREENS */
+@media (max-width: 420px) {
+  .modal-dialog-glass {
+    padding: 1.1rem 0.45rem 0.85rem 0.45rem !important;
+    min-width: unset !important;
+    width: 99vw !important;
+    max-width: 99vw !important;
+    font-size: 13.2px !important;
+  }
+}
+
+/* SCROLL-FRIENDLY FOR MOBILE & REDUCED SIDE PADDING */
+@media (max-width: 430px) {
+  .kavia-container, .container {
+    padding: 3px !important;
+    width: 100vw;
+  }
+  .asset-card-glass {
+    margin: 8px 0 !important;
+  }
+}
+
+/* IMPROVE TAB BAR ON MOBILE */
+@media (max-width: 600px) {
+  .tab-switcher {
+    flex-direction: column !important;
+    gap: 7px !important;
+  }
+}
+
+/* ACCESSIBILITY: FOCUS OUTLINE & FORMS */
+input:focus, select:focus, button:focus, .theme-toggle:focus, .gradient-btn:focus {
+  outline: 2.2px solid #FFD70077 !important;
+  outline-offset: 2px !important;
+}
+input[type="search"]::-webkit-search-cancel-button {
+  appearance: none;
+  display: none;
+}
+
+/* UTILITY: OVERLAY TAP TO CLOSE/MODAL */
+.modal-overlay, .modal-dialog-glass {
+  touch-action: manipulation;
 }
 
 /* MISC */

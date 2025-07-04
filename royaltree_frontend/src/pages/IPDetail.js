@@ -300,21 +300,7 @@ function IPDetail() {
         </motion.div>
       </Modal>
       {/* Responsive fallback: Single column on mobile */}
-      <style>
-        {`
-          @media (max-width: 850px) {
-            .kavia-container > .scroll-fade-in {
-              display: block !important;
-              padding: 26px 7px 20px 7px !important;
-              border-radius: 16px !important;
-            }
-            .kavia-container > .scroll-fade-in > div {
-              margin: 0 auto !important;
-              max-width: 99vw !important;
-            }
-          }
-        `}
-      </style>
+      {/* Responsiveness now handled fully by App.css */}
     </>
   );
 }

@@ -445,32 +445,7 @@ function InvestorDashboard() {
         </motion.div>
       </section>
       {/* Responsive adjustment for mobile/tablet */}
-      <style>
-        {`
-          @media (max-width: 950px) {
-            .asset-grid {
-              grid-template-columns: 1fr !important;
-              gap: 18px 2vw !important;
-              padding: 0 5vw 18px 5vw !important;
-            }
-            .kavia-container {
-              padding: 13px !important;
-            }
-          }
-          @media (max-width: 650px) {
-            .asset-grid {
-              padding: 0 2vw 10px 2vw !important;
-              gap: 12px !important;
-            }
-            .kavia-container {
-              padding: 9px !important;
-            }
-            table {
-              font-size: 14px !important;
-            }
-          }
-        `}
-      </style>
+      {/* Responsiveness now handled by global App.css media queries */}
     </>
   );
 }
