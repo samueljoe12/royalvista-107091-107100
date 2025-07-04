@@ -316,24 +316,24 @@ function UploadAssetModal({ isOpen, onRequestClose, onUpload }) {
             name="assetType"
             value={formData.assetType}
             onChange={handleAssetTypeChange}
-            style={{
-              width: "100%",
-              padding: "0.6rem",
-              borderRadius: 8,
-              border: "none",
-              background: "rgba(255,255,255,0.10)",
-              color: "#fff",
-              fontWeight: 600,
-              fontSize: 15,
-              outline: "none",
-              marginTop: 6,
-              marginBottom: 15,
-            }}
+            className="glass-select"
             aria-label="Choose asset type"
           >
-            <option value="">Select Type</option>
+            <option value="" style={{ color: "#b0afff", background: "#222b" }}>Select Type</option>
             {ASSET_TYPES.map(type => (
-              <option key={type.value} value={type.value}>{type.label}</option>
+              <option
+                key={type.value}
+                value={type.value}
+                style={{
+                  color: "#12121d",
+                  background: "#ffd700", // fallback for contrast
+                  fontWeight: 700,
+                  fontSize: 16,
+                  letterSpacing: ".02em"
+                }}
+              >
+                {type.label}
+              </option>
             ))}
           </select>
         </label>

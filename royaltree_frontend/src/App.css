@@ -435,6 +435,53 @@ input[type="search"]::-webkit-search-cancel-button {
   display: none;
 }
 
+/* GLASSMORPHIC SELECT: Asset Type Dropdown */
+.glass-select {
+  width: 100%;
+  padding: 0.65rem 0.6rem;
+  border-radius: 9px;
+  border: 1.6px solid #FFD70040;
+  background: linear-gradient(117deg, rgba(255,255,255,0.19) 40%, rgba(0,255,194,0.09) 100%);
+  color: #FFD700;
+  font-weight: 800;
+  font-size: 15.3px;
+  box-shadow: 0 2px 10px #FFD70010, 0 1px 8px #00FFC224;
+  outline: none;
+  margin-top: 6px;
+  margin-bottom: 15px;
+  transition: background .18s, color .18s, border-color .16s;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  cursor: pointer;
+}
+.glass-select:focus {
+  border: 2px solid #FFD700;
+  background: linear-gradient(112deg,rgba(255,215,0,0.19),rgba(0,255,194,0.13) 90%);
+  color: #12121d;
+}
+
+.glass-select option {
+  color: #12121d !important;
+  background: #FFD700 !important;
+  font-weight: 700;
+  font-size: 15.3px;
+  padding: 8px 10px;
+  border-radius: 0;
+  outline: none;
+  /* above for accessibility: tested high-contrast on OS select popover as well */
+}
+@media (prefers-color-scheme: dark) {
+  .glass-select, .glass-select:focus {
+    background: linear-gradient(117deg, rgba(32,32,64,0.38), rgba(0,255,194,0.16) 80%);
+    color: #FFD700;
+  }
+  .glass-select option {
+    background: #FFD700 !important;
+    color: #181828 !important;
+  }
+}
+
 /* UTILITY: OVERLAY TAP TO CLOSE/MODAL */
 .modal-overlay, .modal-dialog-glass {
   touch-action: manipulation;
