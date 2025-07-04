@@ -1,7 +1,7 @@
 import React from "react";
 import { motion } from "framer-motion";
 import PropTypes from "prop-types";
-
+import { NavLink } from "react-router-dom";
 /**
  * NavBar - Futuristic glassmorphism navigation bar.
  * @param {Array} links Array of link objects: [{ label: string, href: string }]
@@ -88,36 +88,42 @@ function NavBar({ links = [], logoSrc, brandName, rightSection, geoData }) {
             {label}
           </motion.a>
         ))}
-        {/* IP Detail placeholder nav link */}
-        <motion.span
-          key="ip-detail-placeholder"
-          title="IP Detail (Coming Soon)"
-          style={{
-            color: "#bab9e3",
-            background: "linear-gradient(90deg,#FFD70044 18%,#00FFC219 81%)",
-            opacity: 0.66,
-            fontWeight: 600,
-            fontSize: 16.5,
-            letterSpacing: "0.01em",
+        {/* IP Detail working nav link */}
+        <NavLink
+          to="/ip-detail"
+          className={({ isActive }) => 
+            isActive 
+              ? "active"
+              : undefined
+          }
+          style={({ isActive }) => ({
+            color: isActive ? "#FFD700" : "#fff",
+            textDecoration: "none",
+            fontWeight: 500,
+            fontSize: "17px",
+            letterSpacing: "0.02em",
             padding: "6px 13px",
             borderRadius: 7,
-            border: "1.3px dashed #FFD70066",
-            cursor: "not-allowed",
-            transition: "background 0.18s",
+            background: isActive
+              ? "linear-gradient(90deg,#FFD70022,#00FFC210)"
+              : "linear-gradient(90deg,#FFD70012 18%,#00FFC210 81%)",
+            border: isActive
+              ? "1.6px solid #FFD700AA"
+              : "1.3px solid #FFD70044",
+            boxShadow: isActive
+              ? "0 0 13px #FFD70055"
+              : undefined,
+            transition: "all 0.18s",
             marginLeft: 2,
             userSelect: "none",
             display: "inline-block",
-            textShadow: "0 0 5px #FFD70022"
-          }}
-          whileHover={{
-            scale: 1.04,
-            background: "linear-gradient(90deg,#FFD70066,#00FFC238)",
-            color: "#FFD700"
-          }}
-          aria-disabled="true"
+            textShadow: isActive
+              ? "0 0 8px #FFD700AA"
+              : "0 0 5px #FFD70022"
+          })}
         >
           IP Detail
-        </motion.span>
+        </NavLink>
       </div>
       {rightSection
         ? (
